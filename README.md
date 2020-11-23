@@ -10,6 +10,26 @@ The server also takes care about the underlying implementation of [Unix IPC Sock
 
 Only Unix-like systems such as Linux and Darwin are supported.
 
+## Development
+
+#### Install dependencies
+
+```
+make install
+```
+
+#### Testing and code coverage
+
+```
+make test
+```
+
+#### Build application
+
+```
+make build
+```
+
 ## Resources
 
 - [Xojo IDE Communicator](https://docs.xojo.com/UserGuide:IDE_Communicator)
