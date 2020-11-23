@@ -1,0 +1,144 @@
+---
+kind: pipeline
+type: docker
+name: development
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: test
+  image: golang:1.15.5-buster
+  commands:
+    - make install
+    - make test
+
+trigger:
+  event:
+    - push
+    - pull_request
+  branch:
+    - master
+    - develop
+    - feature/*
+    - bugfix/*
+    - hotfix/*
+
+---
+kind: pipeline
+type: docker
+name: staging
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: compile
+  image: golang:1.15.5-buster
+  commands:
+    - make install
+    - make test
+    - make build
+
+- name: publish
+  image: joseluisq/drone-docker
+  settings:
+    registry:
+      from_secret: dev_registry_url
+    repo:
+      from_secret: dev_registry_repo
+    dockerfile: ./.docker/production/Dockerfile
+    username:
+      from_secret: dev_registry_username
+    password:
+      from_secret: dev_registry_password
+    build_args:
+      - XOJO_IDE_COMMUNICATOR=${DRONE_TAG##v}
+    auto_tag: true
+
+trigger:
+  ref:
+  - refs/tags/**rc**
+  - refs/tags/**alpha**
+  - refs/tags/**beta**
+
+
+---
+kind: pipeline
+type: docker
+name: production
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: compile
+  image: golang:1.15.5-buster
+  commands:
+    - make install
+    - make test
+    - make build
+
+- name: publish
+  image: joseluisq/drone-docker
+  settings:
+    registry:
+      from_secret: prod_registry_url
+    repo:
+      from_secret: prod_registry_repo
+    dockerfile: ./.docker/production/Dockerfile
+    username:
+      from_secret: prod_registry_username
+    password:
+      from_secret: prod_registry_password
+    build_args:
+      - XOJO_IDE_COMMUNICATOR=${DRONE_TAG##v}
+    auto_tag: true
+
+trigger:
+  ref:
+    include:
+    - refs/tags/v*
+    exclude:
+    - refs/tags/**rc**
+    - refs/tags/**alpha**
+    - refs/tags/**latest**
+    - refs/tags/**dev**
+
+---
+kind: pipeline
+type: docker
+name: notification
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: notify
+  image: mike1pol/drone-rocket
+  settings:
+    url:
+      from_secret: rocket_url
+    user_id:
+      from_secret: rocket_id
+    token:
+      from_secret: rocket_token
+    channel:
+      from_secret: rocket_channel
+    message: |
+      {{#success build.status}}✅{{else}}❌{{/success}} **{{repo.name}}** {{build.status}} build [#{{build.number}} {{build.message}}]({{build.link}}).
+      Commit `{{build.commit}}` by @{{build.author}} on branch/tag `{{build.branch}}`.
+
+depends_on:
+- development
+- staging
+- production
+
+trigger:
+  status:
+  - success
+  - failure
