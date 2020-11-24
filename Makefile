@@ -5,6 +5,11 @@ install:
 	@go get -v golang.org/x/lint/golint
 .PHONY: install
 
+run:
+	@go version
+	@go run main.go
+.PHONY: run
+
 test:
 	@go version
 	@golint -set_exit_status ./...

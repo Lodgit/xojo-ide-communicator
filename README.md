@@ -12,6 +12,12 @@ Only Unix-like systems such as Linux and Darwin are supported.
 
 ## Development
 
+#### Run application
+
+```
+make run
+```
+
 #### Install dependencies
 
 ```
