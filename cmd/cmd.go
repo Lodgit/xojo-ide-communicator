@@ -7,13 +7,13 @@ import (
 	"github.com/joseluisq/goipcc"
 )
 
-// Execute is the main entry point if current application.
+// Execute is the main entry point of the current application.
 func Execute() {
 	// Example of how compile a Xojo app via Unix IPC socket communication
 
 	// Connect to socket in oder to exchange data
-	ipc, err := goipcc.Connect(UnixSocketPath)
-	if err != nil {
+	ipc := goipcc.New(UnixSocketPath)
+	if err := ipc.Connect(); err != nil {
 		log.Println("unable to communicate with socket:", err)
 		os.Exit(1)
 	}
