@@ -10,7 +10,7 @@ platform:
 steps:
 - name: build
   commands:
-  - echo 'Xojo IDE communicator - building a Xojo Desktop project on local...'
+  - echo 'Xojo IDE communicator - building a Xojo Desktop project on local machine...'
   - go run main.go
 
 ---
