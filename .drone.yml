@@ -1,20 +1,5 @@
 ---
 kind: pipeline
-type: exec
-name: local
-
-platform:
-  os: darwin
-  arch: amd64
-
-steps:
-- name: build
-  commands:
-  - echo 'Xojo IDE communicator - building a Xojo Desktop project on local machine...'
-  - go run main.go
-
----
-kind: pipeline
 type: docker
 name: development
 
@@ -40,88 +25,6 @@ trigger:
     - bugfix/*
     - hotfix/*
 
----
-kind: pipeline
-type: docker
-name: staging
-
-platform:
-  os: linux
-  arch: amd64
-
-steps:
-- name: compile
-  image: golang:1.15.5-buster
-  commands:
-    - make install
-    - make test
-    - make build
-
-- name: publish
-  image: joseluisq/drone-docker
-  settings:
-    registry:
-      from_secret: dev_registry_url
-    repo:
-      from_secret: dev_registry_repo
-    dockerfile: ./.docker/production/Dockerfile
-    username:
-      from_secret: dev_registry_username
-    password:
-      from_secret: dev_registry_password
-    build_args:
-      - XOJO_IDE_COMMUNICATOR=${DRONE_TAG##v}
-    auto_tag: true
-
-trigger:
-  ref:
-  - refs/tags/**rc**
-  - refs/tags/**alpha**
-  - refs/tags/**beta**
-
-
----
-kind: pipeline
-type: docker
-name: production
-
-platform:
-  os: linux
-  arch: amd64
-
-steps:
-- name: compile
-  image: golang:1.15.5-buster
-  commands:
-    - make install
-    - make test
-    - make build
-
-- name: publish
-  image: joseluisq/drone-docker
-  settings:
-    registry:
-      from_secret: prod_registry_url
-    repo:
-      from_secret: prod_registry_repo
-    dockerfile: ./.docker/production/Dockerfile
-    username:
-      from_secret: prod_registry_username
-    password:
-      from_secret: prod_registry_password
-    build_args:
-      - XOJO_IDE_COMMUNICATOR=${DRONE_TAG##v}
-    auto_tag: true
-
-trigger:
-  ref:
-    include:
-    - refs/tags/v*
-    exclude:
-    - refs/tags/**rc**
-    - refs/tags/**alpha**
-    - refs/tags/**latest**
-    - refs/tags/**dev**
 
 ---
 kind: pipeline
@@ -150,8 +53,6 @@ steps:
 
 depends_on:
 - development
-- staging
-- production
 
 trigger:
   status:
