@@ -1,5 +1,20 @@
 ---
 kind: pipeline
+type: exec
+name: local
+
+platform:
+  os: darwin
+  arch: amd64
+
+steps:
+- name: build
+  commands:
+  - go run main.go
+
+
+---
+kind: pipeline
 type: docker
 name: development
 
