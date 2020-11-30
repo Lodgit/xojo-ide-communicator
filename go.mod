@@ -2,4 +2,7 @@ module xojoidecom
 
 go 1.15
 
-require github.com/joseluisq/goipcc v0.1.0
+require (
+	github.com/joseluisq/cline v0.1.0-beta.8
+	github.com/joseluisq/goipcc v0.1.0
+)

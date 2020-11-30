@@ -3,43 +3,72 @@ package cmd
 import (
 	"log"
 	"os"
+	"xojoidecom/xojo"
 
-	"github.com/joseluisq/goipcc"
+	cli "github.com/joseluisq/cline"
+)
+
+// Build-time application values
+var (
+	versionNumber string = "devel"
+	buildTime     string
 )
 
 // Execute is the main entry point of the current application.
 func Execute() {
-	// Example of how compile a Xojo app via Unix IPC socket communication
-
-	// Connect to socket in oder to exchange data
-	ipc := goipcc.New(UnixSocketPath)
-	if err := ipc.Connect(); err != nil {
-		log.Println("unable to communicate with socket:", err)
-		os.Exit(1)
+	app := cli.New()
+	app.Name = "xojo-ide-com"
+	app.Summary = "CLI client to communicate transparently with Xojo IDE using The Xojo IDE Communication Protocol v2."
+	app.Version = versionNumber
+	app.BuildTime = buildTime
+	app.Commands = []cli.Cmd{
+		{
+			Name:    "run",
+			Summary: "Runs a Xojo project in debug mode.",
+			Flags:   []cli.Flag{},
+			Handler: func(ctx *cli.CmdContext) error {
+				xo := xojo.New()
+				if err := xo.Connect(); err != nil {
+					return err
+				}
+				defer xo.Close()
+				run := xo.Commands.Run
+				err := run.Exec(func(data []byte, err error) {
+					if err != nil {
+						log.Fatalln(err)
+					}
+					log.Println("Data received:", string(data))
+				})
+				return err
+			},
+		},
+		{
+			Name:    "build",
+			Summary: "Builds a Xojo project.",
+			Flags:   []cli.Flag{},
+			Handler: func(ctx *cli.CmdContext) error {
+				xo := xojo.New()
+				if err := xo.Connect(); err != nil {
+					return err
+				}
+				defer xo.Close()
+				build := xo.Commands.Build
+				err := build.Exec(func(data []byte, err error) {
+					if err != nil {
+						log.Fatalln(err)
+					}
+					log.Println("Data received:", string(data))
+				})
+				return err
+			},
+		},
 	}
-
-	// Xojo IDE Communication Protocol commands in oder to compile a opened Xojo project
-	instructions := []string{
-		"{\"protocol\":2}\x00",
-		"{\"script\":\"Print BuildApp(16,False)\", \"tag\":\"build\"}\x00",
+	app.Handler = appHandler
+	if err := app.Run(os.Args); err != nil {
+		log.Fatalln(err)
 	}
-	for i, req := range instructions {
-		log.Println("client data sent:", req)
+}
 
-		var err error
-		// Skip first sent since it just specifies the protocol without return
-		if i == 0 {
-			_, err = ipc.Write([]byte(req), nil)
-		} else {
-			// Next sent will return a Xojo response after the project compilation
-			_, err = ipc.Write([]byte(req), func(resp []byte, err error) {
-				log.Println("client data received:", string(resp))
-			})
-		}
-		if err != nil {
-			log.Fatalln("unable to write to socket:", err)
-		}
-	}
-
-	ipc.Close()
+func appHandler(ctx *cli.AppContext) error {
+	return nil
 }

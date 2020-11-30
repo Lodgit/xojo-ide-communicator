@@ -1,16 +1,16 @@
 package xojo
 
-// Program defines the Xojo IDE program handler.
-type Program struct {
-	zExecPath string
+// program defines the Xojo IDE program handler.
+type program struct {
+	execPath string
 }
 
 // Start starts Xojo IDE program.
-func (p *Program) Start() {
+func (p *program) Start() {
 	// TODO:
 }
 
 // Close closes current Xojo IDE program.
-func (p *Program) Close() {
+func (p *program) Close() {
 	// TODO:
 }
