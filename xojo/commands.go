@@ -3,17 +3,18 @@ package xojo
 import (
 	"fmt"
 	"log"
+	"os/exec"
 
 	"github.com/joseluisq/goipcc"
 )
 
-// Commands defines a command for run a Xojo project.
-type Commands struct {
+// ProjectCommands defines a command for run a Xojo project.
+type ProjectCommands struct {
 	sock *goipcc.IPCSockClient
 }
 
-// Run runs the current opened project.
-func (c *Commands) Run(handler func(data []byte, err error)) error {
+// Run runs the current opened Xojo project.
+func (c *ProjectCommands) Run(handler func(data []byte, err error)) error {
 	str := "{\"tag\":\"build\",\"script\":\"DoCommand(\\\"RunApp\\\")\nprint \\\"App is running.\\\"\"}\x00"
 	log.Println("run project command sent:", str)
 	_, err := c.sock.Write([]byte(str), handler)
@@ -23,9 +24,16 @@ func (c *Commands) Run(handler func(data []byte, err error)) error {
 	return nil
 }
 
+// Open opens a specific Xojo project.
+func (c *ProjectCommands) Open(xojoProjectFilePath string, handler func(data []byte, err error)) error {
+	// TODO: Figure out how to know when Xojo has finally loaded a project
+	// since a project can take time to load ranging from seconds to minutes.
+	return exec.Command("open", xojoProjectFilePath).Run()
+}
+
 // Close closes the current opened project.
-func (c *Commands) Close(handler func(data []byte, err error)) error {
-	str := "{\"tag\":\"build\",\"script\":\"CloseProject(False)\nprint \\\"App is closed.\\\"\"}\x00"
+func (c *ProjectCommands) Close(handler func(data []byte, err error)) error {
+	str := "{\"tag\":\"build\",\"script\":\"CloseProject(False)\nprint \\\"Default app closed.\\\"\"}\x00"
 	log.Println("close project sent:", str)
 	_, err := c.sock.Write([]byte(str), handler)
 	if err != nil {
@@ -34,7 +42,7 @@ func (c *Commands) Close(handler func(data []byte, err error)) error {
 	return nil
 }
 
-// BuildOptions defines build project options.
+// BuildOptions defines build Xojo project options.
 type BuildOptions struct {
 	// Value	Build Target		32/64-bit	Architecture
 	// 3 		Windows 			32-bit		Intel
@@ -57,8 +65,8 @@ type BuildOptions struct {
 	Reveal bool
 }
 
-// Build builds current opened project.
-func (c *Commands) Build(opt BuildOptions, handler func(data []byte, err error)) error {
+// Build builds current opened Xojo project.
+func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err error)) error {
 	var buildType int
 	if opt.OS == "windows" && opt.Arch == "i386" {
 		buildType = 3
@@ -83,6 +91,10 @@ func (c *Commands) Build(opt BuildOptions, handler func(data []byte, err error))
 	}
 	if opt.OS == "ios" && opt.Arch == "arm64" {
 		buildType = 15
+	}
+
+	if buildType == 0 {
+		return fmt.Errorf("Xojo build options provided were not specified or are not unsupported")
 	}
 
 	var reveal string

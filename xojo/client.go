@@ -9,9 +9,8 @@ import (
 // Client defines the Xojo IDE client communicator.
 type Client struct {
 	sock         *goipcc.IPCSockClient
-	program      *program
 	protoVersion string
-	Commands     *Commands
+	ProjectCmds  *ProjectCommands
 }
 
 // New creates a new Xojo client instance.
@@ -21,10 +20,7 @@ func New() *Client {
 	return &Client{
 		sock:         sock,
 		protoVersion: protoVersion,
-		program: &program{
-			execPath: xojoExecFile,
-		},
-		Commands: &Commands{
+		ProjectCmds: &ProjectCommands{
 			sock: sock,
 		},
 	}

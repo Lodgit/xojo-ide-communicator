@@ -24,14 +24,37 @@ func Execute() {
 	app.Commands = []cli.Cmd{
 		{
 			Name:    "run",
-			Summary: "Runs a Xojo opened project in debug mode.",
+			Summary: "Runs a Xojo opened project in debug mode. Example: xojo-ide-com build [OPTIONS] PROJECT_FILE_PATH",
 			Handler: func(ctx *cli.CmdContext) error {
+				// 0. Check for project file path argument
+				if len(ctx.TailArgs) == 0 {
+					log.Fatalln("xojo project file path was not provided.")
+				}
+				// 1. Xojo socket connection
 				xo := xojo.New()
 				if err := xo.Connect(); err != nil {
 					return err
 				}
 				defer xo.Close()
-				err := xo.Commands.Run(func(data []byte, err error) {
+				// 2. Close current project first
+				err := xo.ProjectCmds.Close(func(data []byte, err error) {
+					if err != nil {
+						log.Fatalln(err)
+					}
+					log.Println("data received:", string(data))
+				})
+				// 3. TODO: Open a new specific project
+				err = xo.ProjectCmds.Open(ctx.TailArgs[0], func(data []byte, err error) {
+					if err != nil {
+						log.Fatalln(err)
+					}
+					log.Println("data received:", string(data))
+				})
+				if err != nil {
+					log.Fatalln(err)
+				}
+				// 4. Run current specified project
+				err = xo.ProjectCmds.Run(func(data []byte, err error) {
 					if err != nil {
 						log.Fatalln(err)
 					}
@@ -42,7 +65,7 @@ func Execute() {
 		},
 		{
 			Name:    "build",
-			Summary: "Builds a Xojo opened project.",
+			Summary: "Builds a Xojo opened project. Example: xojo-ide-com build [OPTIONS] PROJECT_FILE_PATH",
 			Flags: []cli.Flag{
 				cli.FlagString{
 					Name:    "os",
@@ -59,39 +82,63 @@ func Execute() {
 				},
 			},
 			Handler: func(ctx *cli.CmdContext) error {
+				// 0. Check for project file path argument
+				if len(ctx.TailArgs) == 0 {
+					log.Fatalln("xojo project file path was not provided.")
+				}
+				// 1. Validate arguments
+				reveal, err := ctx.Flags.Bool("reveal")
+				if err != nil {
+					return err
+				}
+				osStr := ctx.Flags.String("os")
+				if osStr == "" {
+					log.Fatalln("no operating system was specified")
+				}
+				archStr := ctx.Flags.String("arch")
+				if archStr == "" {
+					log.Fatalln("no architecture was specified")
+				}
+				// 2. Xojo socket connection
 				xo := xojo.New()
 				if err := xo.Connect(); err != nil {
 					return err
 				}
 				defer xo.Close()
-				reveal, err := ctx.Flags.Bool("reveal")
-				if err != nil {
-					return err
-				}
-				opts := xojo.BuildOptions{
-					OS:     ctx.Flags.String("os"),
-					Arch:   ctx.Flags.String("arch"),
-					Reveal: reveal,
-				}
-				err = xo.Commands.Build(opts, func(data []byte, err error) {
+				// 3. Close current project first
+				err = xo.ProjectCmds.Close(func(data []byte, err error) {
 					if err != nil {
 						log.Fatalln(err)
 					}
 					log.Println("data received:", string(data))
 				})
-				return err
-			},
-		},
-		{
-			Name:    "close",
-			Summary: "Closes a Xojo opened project.",
-			Handler: func(ctx *cli.CmdContext) error {
-				xo := xojo.New()
-				if err := xo.Connect(); err != nil {
+				// 4. TODO: Open the specified project
+				err = xo.ProjectCmds.Open(ctx.TailArgs[0], func(data []byte, err error) {
+					if err != nil {
+						log.Fatalln(err)
+					}
+					log.Println("data received:", string(data))
+				})
+				if err != nil {
+					log.Fatalln(err)
+				}
+				opts := xojo.BuildOptions{
+					OS:     osStr,
+					Arch:   archStr,
+					Reveal: reveal,
+				}
+				// 5. Build the specified project
+				err = xo.ProjectCmds.Build(opts, func(data []byte, err error) {
+					if err != nil {
+						log.Fatalln(err)
+					}
+					log.Println("data received:", string(data))
+				})
+				if err != nil {
 					return err
 				}
-				defer xo.Close()
-				err := xo.Commands.Close(func(data []byte, err error) {
+				// 6. Close current project
+				err = xo.ProjectCmds.Close(func(data []byte, err error) {
 					if err != nil {
 						log.Fatalln(err)
 					}
