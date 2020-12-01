@@ -14,14 +14,6 @@ type Client struct {
 	Commands     *Commands
 }
 
-// Commands defines the instructions set to instrument Xojo IDE.
-type Commands struct {
-	// Runs the current Xojo project in debug mode.
-	Run *runCommand
-	// Builds the current Xojo project.
-	Build *buildCommand
-}
-
 // New creates a new Xojo client instance.
 func New() *Client {
 	sock := goipcc.New(xojoUnixSocketPath)
@@ -33,8 +25,7 @@ func New() *Client {
 			execPath: xojoExecFile,
 		},
 		Commands: &Commands{
-			Run:   &runCommand{sock},
-			Build: &buildCommand{sock},
+			sock: sock,
 		},
 	}
 }
