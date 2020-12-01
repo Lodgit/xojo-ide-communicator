@@ -1,6 +1,7 @@
 package xojo
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/joseluisq/goipcc"
@@ -33,10 +34,65 @@ func (c *Commands) Close(handler func(data []byte, err error)) error {
 	return nil
 }
 
+// BuildOptions defines build project options.
+type BuildOptions struct {
+	// Value	Build Target		32/64-bit	Architecture
+	// 3 		Windows 			32-bit		Intel
+	// 4 		Linux				32-bit		Intel
+	// 9 		macOS Universal		64-bit		Intel & ARM
+	// 12 		Xojo Cloud			32-bit		Intel
+	// 14 		iOS Simulator		64-bit		Intel
+	// 15 		iOS					64-bit		ARM
+	// 16 		Mac (all)			64-bit		Intel
+	// 17 		Linux				64-bit		Intel
+	// 18 		Linux				32-bit		ARM
+	// 19 		Windows				64-bit		Intel
+	// 24 		macOS				64-bit		ARM
+
+	// Target operating system
+	OS string
+	// Target architecture
+	Arch string
+	// If reveal is true then the built app is displayed using the OS file manager.
+	Reveal bool
+}
+
 // Build builds current opened project.
-func (c *Commands) Build(handler func(data []byte, err error)) error {
-	// TODO: customize `BuildApp` args
-	str := "{\"script\":\"Print BuildApp(16,False)\", \"tag\":\"build\"}\x00"
+func (c *Commands) Build(opt BuildOptions, handler func(data []byte, err error)) error {
+	var buildType int
+	if opt.OS == "windows" && opt.Arch == "i386" {
+		buildType = 3
+	}
+	if opt.OS == "windows" && opt.Arch == "amd64" {
+		buildType = 19
+	}
+	if opt.OS == "darwin" && opt.Arch == "amd64" {
+		buildType = 16
+	}
+	if opt.OS == "darwin" && opt.Arch == "arm64" {
+		buildType = 24
+	}
+	if opt.OS == "linux" && opt.Arch == "i386" {
+		buildType = 4
+	}
+	if opt.OS == "linux" && opt.Arch == "amd64" {
+		buildType = 17
+	}
+	if opt.OS == "ios" && opt.Arch == "amd64" {
+		buildType = 14
+	}
+	if opt.OS == "ios" && opt.Arch == "arm64" {
+		buildType = 15
+	}
+
+	var reveal string
+	if opt.Reveal {
+		reveal = "True"
+	} else {
+		reveal = "False"
+	}
+
+	str := fmt.Sprintf("{\"script\":\"Print BuildApp(%d,%s)\", \"tag\":\"build\"}\x00", buildType, reveal)
 	log.Println("build project command sent:", str)
 	_, err := c.sock.Write([]byte(str), handler)
 	if err != nil {

@@ -43,13 +43,37 @@ func Execute() {
 		{
 			Name:    "build",
 			Summary: "Builds a Xojo opened project.",
+			Flags: []cli.Flag{
+				cli.FlagString{
+					Name:    "os",
+					Summary: "Target operating system such as `linux`, `darwin`, `windows` and `ios`.",
+				},
+				cli.FlagString{
+					Name:    "arch",
+					Summary: "Target architecture such as `i386`, `amd64` and `arm64`.",
+				},
+				cli.FlagBool{
+					Name:    "reveal",
+					Value:   false,
+					Summary: "Open the built application directory using the operating system file manager available.",
+				},
+			},
 			Handler: func(ctx *cli.CmdContext) error {
 				xo := xojo.New()
 				if err := xo.Connect(); err != nil {
 					return err
 				}
 				defer xo.Close()
-				err := xo.Commands.Build(func(data []byte, err error) {
+				reveal, err := ctx.Flags.Bool("reveal")
+				if err != nil {
+					return err
+				}
+				opts := xojo.BuildOptions{
+					OS:     ctx.Flags.String("os"),
+					Arch:   ctx.Flags.String("arch"),
+					Reveal: reveal,
+				}
+				err = xo.Commands.Build(opts, func(data []byte, err error) {
 					if err != nil {
 						log.Fatalln(err)
 					}
