@@ -24,7 +24,7 @@ func Execute() {
 	app.Commands = []cli.Cmd{
 		{
 			Name:    "run",
-			Summary: "Runs a Xojo project in debug mode.",
+			Summary: "Runs a Xojo opened project in debug mode.",
 			Handler: func(ctx *cli.CmdContext) error {
 				xo := xojo.New()
 				if err := xo.Connect(); err != nil {
@@ -32,6 +32,24 @@ func Execute() {
 				}
 				defer xo.Close()
 				err := xo.Commands.Run(func(data []byte, err error) {
+					if err != nil {
+						log.Fatalln(err)
+					}
+					log.Println("data received:", string(data))
+				})
+				return err
+			},
+		},
+		{
+			Name:    "build",
+			Summary: "Builds a Xojo opened project.",
+			Handler: func(ctx *cli.CmdContext) error {
+				xo := xojo.New()
+				if err := xo.Connect(); err != nil {
+					return err
+				}
+				defer xo.Close()
+				err := xo.Commands.Build(func(data []byte, err error) {
 					if err != nil {
 						log.Fatalln(err)
 					}
@@ -50,24 +68,6 @@ func Execute() {
 				}
 				defer xo.Close()
 				err := xo.Commands.Close(func(data []byte, err error) {
-					if err != nil {
-						log.Fatalln(err)
-					}
-					log.Println("data received:", string(data))
-				})
-				return err
-			},
-		},
-		{
-			Name:    "build",
-			Summary: "Builds a Xojo project.",
-			Handler: func(ctx *cli.CmdContext) error {
-				xo := xojo.New()
-				if err := xo.Connect(); err != nil {
-					return err
-				}
-				defer xo.Close()
-				err := xo.Commands.Build(func(data []byte, err error) {
 					if err != nil {
 						log.Fatalln(err)
 					}
