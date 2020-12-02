@@ -57,9 +57,7 @@ type BuildOptions struct {
 
 // Build builds current opened Xojo project.
 func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err error)) error {
-	var buildType int
-
-	// IDE Scripting building commands
+	// IDE Scripting building options
 	// https://docs.xojo.com/UserGuide:IDE_Scripting_Building_Commands
 	// Value	Build Target		32/64-bit	Architecture
 	// 3 		Windows 			32-bit		Intel
@@ -74,6 +72,7 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 	// 19 		Windows				64-bit		Intel
 	// 24 		macOS				64-bit		ARM
 
+	var buildType int
 	if opt.OS == "windows" && opt.Arch == "i386" {
 		buildType = 3
 	}
@@ -98,7 +97,6 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 	if opt.OS == "ios" && opt.Arch == "arm64" {
 		buildType = 15
 	}
-
 	if buildType == 0 {
 		return fmt.Errorf("Xojo build options provided were not specified or unsupported")
 	}
