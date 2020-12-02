@@ -24,7 +24,7 @@ func Execute() {
 	app.Commands = []cli.Cmd{
 		{
 			Name:    "run",
-			Summary: "Runs a Xojo opened project in debug mode. Example: xojo-ide-com run [OPTIONS] PROJECT_FILE_PATH",
+			Summary: "Runs a Xojo project in debug mode. Example: xojo-ide-com run [OPTIONS] PROJECT_FILE_PATH",
 			Handler: func(ctx *cli.CmdContext) error {
 				// 0. Check for project file path argument
 				if len(ctx.TailArgs) == 0 {
@@ -65,11 +65,11 @@ func Execute() {
 		},
 		{
 			Name:    "build",
-			Summary: "Builds a Xojo opened project. Example: xojo-ide-com build [OPTIONS] PROJECT_FILE_PATH",
+			Summary: "Builds a Xojo project. Example: xojo-ide-com build [OPTIONS] PROJECT_FILE_PATH",
 			Flags: []cli.Flag{
-				cli.FlagString{
+				cli.FlagStringSlice{
 					Name:    "os",
-					Summary: "Target operating system such as `linux`, `darwin`, `windows` and `ios`.",
+					Summary: "Operating system target(s) such as `linux`, `darwin`, `windows` and `ios`. For multiple targets use a coma-separated list.",
 				},
 				cli.FlagString{
 					Name:    "arch",
@@ -91,8 +91,8 @@ func Execute() {
 				if err != nil {
 					return err
 				}
-				osStr := ctx.Flags.String("os")
-				if osStr == "" {
+				osStrSlice := ctx.Flags.StringSlice("os")
+				if len(osStrSlice) == 0 {
 					log.Fatalln("no operating system was specified")
 				}
 				archStr := ctx.Flags.String("arch")
@@ -122,20 +122,22 @@ func Execute() {
 				if err != nil {
 					log.Fatalln(err)
 				}
-				opts := xojo.BuildOptions{
-					OS:     osStr,
-					Arch:   archStr,
-					Reveal: reveal,
-				}
-				// 5. Build the specified project
-				err = xo.ProjectCmds.Build(opts, func(data []byte, err error) {
-					if err != nil {
-						log.Fatalln(err)
+				// 5. Build the specified project for each operating system(s) chosen
+				for _, osStr := range osStrSlice {
+					opts := xojo.BuildOptions{
+						OS:     osStr,
+						Arch:   archStr,
+						Reveal: reveal,
 					}
-					log.Println("data received:", string(data))
-				})
-				if err != nil {
-					return err
+					err = xo.ProjectCmds.Build(opts, func(data []byte, err error) {
+						if err != nil {
+							log.Fatalln(err)
+						}
+						log.Println("data received:", string(data))
+					})
+					if err != nil {
+						return err
+					}
 				}
 				// 6. Close current project
 				err = xo.ProjectCmds.Close(func(data []byte, err error) {
