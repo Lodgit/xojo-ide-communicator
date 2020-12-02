@@ -97,7 +97,7 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 	}
 
 	if buildType == 0 {
-		return fmt.Errorf("Xojo build options provided were not specified or are not unsupported")
+		return fmt.Errorf("Xojo build options provided were not specified or unsupported")
 	}
 
 	var reveal string

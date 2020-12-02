@@ -24,7 +24,7 @@ func Execute() {
 	app.Commands = []cli.Cmd{
 		{
 			Name:    "run",
-			Summary: "Runs a Xojo opened project in debug mode. Example: xojo-ide-com build [OPTIONS] PROJECT_FILE_PATH",
+			Summary: "Runs a Xojo opened project in debug mode. Example: xojo-ide-com run [OPTIONS] PROJECT_FILE_PATH",
 			Handler: func(ctx *cli.CmdContext) error {
 				// 0. Check for project file path argument
 				if len(ctx.TailArgs) == 0 {
@@ -43,7 +43,7 @@ func Execute() {
 					}
 					log.Println("data received:", string(data))
 				})
-				// 3. TODO: Open a new specific project
+				// 3. Open a new specific project
 				err = xo.ProjectCmds.Open(ctx.TailArgs[0], func(data []byte, err error) {
 					if err != nil {
 						log.Fatalln(err)
@@ -112,7 +112,7 @@ func Execute() {
 					}
 					log.Println("data received:", string(data))
 				})
-				// 4. TODO: Open the specified project
+				// 4. Open the specified project
 				err = xo.ProjectCmds.Open(ctx.TailArgs[0], func(data []byte, err error) {
 					if err != nil {
 						log.Fatalln(err)
