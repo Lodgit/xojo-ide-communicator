@@ -3,7 +3,6 @@ package xojo
 import (
 	"fmt"
 	"log"
-	"os/exec"
 
 	"github.com/joseluisq/goipcc"
 )
@@ -26,15 +25,19 @@ func (c *ProjectCommands) Run(handler func(data []byte, err error)) error {
 
 // Open opens a specific Xojo project.
 func (c *ProjectCommands) Open(xojoProjectFilePath string, handler func(data []byte, err error)) error {
-	// TODO: Figure out how to know when Xojo has finally loaded a project
-	// since a project can take time to load ranging from seconds to minutes.
-	return exec.Command("open", xojoProjectFilePath).Run()
+	str := fmt.Sprintf("{\"tag\":\"build\",\"script\":\"OpenFile(\\\"%s\\\")\nprint \\\"Project is opened.\\\"\"}\x00", xojoProjectFilePath)
+	log.Println("open project command sent:", str)
+	_, err := c.sock.Write([]byte(str), handler)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Close closes the current opened project.
 func (c *ProjectCommands) Close(handler func(data []byte, err error)) error {
 	str := "{\"tag\":\"build\",\"script\":\"CloseProject(False)\nprint \\\"Default app closed.\\\"\"}\x00"
-	log.Println("close project sent:", str)
+	log.Println("close project command sent:", str)
 	_, err := c.sock.Write([]byte(str), handler)
 	if err != nil {
 		return err
