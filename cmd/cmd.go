@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"time"
 	"xojoidecom/xojo"
 
 	cli "github.com/joseluisq/cline"
@@ -78,6 +79,9 @@ func Execute() {
 					}
 					log.Println("data received:", string(data))
 				})
+				// TODO: development purposes only
+				log.Println("Waiting to finish....")
+				time.Sleep(10 * time.Second)
 				return err
 			},
 		},
