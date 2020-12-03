@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 	"os"
+	"path"
 	"xojoidecom/xojo"
 
 	cli "github.com/joseluisq/cline"
@@ -21,14 +22,31 @@ func Execute() {
 	app.Summary = "CLI client to communicate transparently with Xojo IDE using The Xojo IDE Communication Protocol v2."
 	app.Version = versionNumber
 	app.BuildTime = buildTime
+	app.Flags = []cli.Flag{
+		cli.FlagBool{
+			Name:    "use-current-workdir",
+			Summary: "Use the current working directory as the base path for \"PROJECT_FILE_PATH\" argument on `run` and `build` commands.",
+			Aliases: []string{"w"},
+		},
+	}
 	app.Commands = []cli.Cmd{
 		{
 			Name:    "run",
 			Summary: "Runs a Xojo project in debug mode. Example: xojo-ide-com run [OPTIONS] PROJECT_FILE_PATH",
 			Handler: func(ctx *cli.CmdContext) error {
 				// 0. Check for project file path argument
-				if len(ctx.TailArgs) == 0 {
+				if len(ctx.TailArgs) == 0 || ctx.TailArgs[0] == "" {
 					log.Fatalln("xojo project file path was not provided.")
+				}
+				// Capture the file path argument and check for a "current working directory" usage
+				filePath := ctx.TailArgs[0]
+				useWorkdir := ctx.AppContext.Flags.IsProvidedFlag("use-current-workdir")
+				if useWorkdir {
+					cwd, err := os.Getwd()
+					if err != nil {
+						return err
+					}
+					filePath = path.Join(cwd, filePath)
 				}
 				// 1. Xojo socket connection
 				xo := xojo.New()
@@ -44,7 +62,7 @@ func Execute() {
 					log.Println("data received:", string(data))
 				})
 				// 3. Open a new specific project
-				err = xo.ProjectCmds.Open(ctx.TailArgs[0], func(data []byte, err error) {
+				err = xo.ProjectCmds.Open(filePath, func(data []byte, err error) {
 					if err != nil {
 						log.Fatalln(err)
 					}
@@ -83,8 +101,18 @@ func Execute() {
 			},
 			Handler: func(ctx *cli.CmdContext) error {
 				// 0. Check for project file path argument
-				if len(ctx.TailArgs) == 0 {
+				if len(ctx.TailArgs) == 0 || ctx.TailArgs[0] == "" {
 					log.Fatalln("xojo project file path was not provided.")
+				}
+				// Capture the file path argument and check for a "current working directory" usage
+				filePath := ctx.TailArgs[0]
+				useWorkdir := ctx.AppContext.Flags.IsProvidedFlag("use-current-workdir")
+				if useWorkdir {
+					cwd, err := os.Getwd()
+					if err != nil {
+						return err
+					}
+					filePath = path.Join(cwd, filePath)
 				}
 				// 1. Validate arguments
 				reveal, err := ctx.Flags.Bool("reveal")
