@@ -70,14 +70,16 @@ func Execute() {
 				// 2. Close current project first
 				err = xo.ProjectCmds.Close(func(data []byte, err error) {
 					if err != nil {
-						log.Fatalln(err)
+						log.Println(err)
+						log.Fatalln(string(data))
 					}
 					log.Println("data received:", string(data))
 				})
 				// 3. Open a new specific project
 				err = xo.ProjectCmds.Open(filePath, func(data []byte, err error) {
 					if err != nil {
-						log.Fatalln(err)
+						log.Println(err)
+						log.Fatalln(string(data))
 					}
 					log.Println("data received:", string(data))
 				})
@@ -87,7 +89,8 @@ func Execute() {
 				// 4. Run current specified project
 				err = xo.ProjectCmds.Run(func(data []byte, err error) {
 					if err != nil {
-						log.Fatalln(err)
+						log.Println(err)
+						log.Fatalln(string(data))
 					}
 					log.Println("data received:", string(data))
 				})
@@ -151,14 +154,16 @@ func Execute() {
 				// 3. Close current project first
 				err = xo.ProjectCmds.Close(func(data []byte, err error) {
 					if err != nil {
-						log.Fatalln(err)
+						log.Println(err)
+						log.Fatalln(string(data))
 					}
 					log.Println("data received:", string(data))
 				})
 				// 4. Open the specified project
 				err = xo.ProjectCmds.Open(ctx.TailArgs[0], func(data []byte, err error) {
 					if err != nil {
-						log.Fatalln(err)
+						log.Println(err)
+						log.Fatalln(string(data))
 					}
 					log.Println("data received:", string(data))
 				})
@@ -174,7 +179,8 @@ func Execute() {
 					}
 					err = xo.ProjectCmds.Build(opts, func(data []byte, err error) {
 						if err != nil {
-							log.Fatalln(err)
+							log.Println(err)
+							log.Fatalln(string(data))
 						}
 						log.Println("data received:", string(data))
 					})
@@ -185,7 +191,8 @@ func Execute() {
 				// 6. Close current project
 				err = xo.ProjectCmds.Close(func(data []byte, err error) {
 					if err != nil {
-						log.Fatalln(err)
+						log.Println(err)
+						log.Fatalln(string(data))
 					}
 					log.Println("data received:", string(data))
 				})
