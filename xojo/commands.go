@@ -8,14 +8,24 @@ import (
 	"github.com/joseluisq/goipcc"
 )
 
+var xojoErrors = [][]byte{
+	[]byte("buildError"),
+	[]byte("loadError"),
+	[]byte("openErrors"),
+	[]byte("scriptError"),
+}
+
+// checkForErrorResponse just checks many possible errors during commands execution.
 func checkForErrorResponse(jsonb []byte, err error) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if bytes.Contains(jsonb, []byte("scriptError")) || bytes.Contains(jsonb, []byte("openErrors")) || bytes.Contains(jsonb, []byte("loadError")) {
-		return jsonb, fmt.Errorf(
-			"an error has occurred during Xojo IDE commands execution, please check the response output",
-		)
+	for _, e := range xojoErrors {
+		if bytes.Contains(jsonb, e) {
+			return jsonb, fmt.Errorf(
+				"Xojo IDE commands execution error occurred, please check the response output",
+			)
+		}
 	}
 	return jsonb, nil
 }
