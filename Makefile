@@ -5,6 +5,11 @@ install:
 	@go get -v golang.org/x/lint/golint
 .PHONY: install
 
+run:
+	@go version
+	@go run main.go
+.PHONY: run
+
 test:
 	@go version
 	@golint -set_exit_status ./...
@@ -16,5 +21,5 @@ build:
 	@go version
 	@go build -v \
 		-ldflags "-s -w -X 'main.version=0.0.0' -X 'main.buildTime=$(BUILD_TIME)'" \
-		-a -o bin/goipcc main.go
+		-a -o bin/xojo-ide-com main.go
 .PHONY: build

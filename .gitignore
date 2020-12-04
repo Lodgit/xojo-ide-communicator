@@ -5,3 +5,6 @@ vendor
 *.txt
 *.log
 *.bin
+.vscode
+**/.DS_Store
+TODO

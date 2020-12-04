@@ -1,0 +1,60 @@
+---
+kind: pipeline
+type: docker
+name: development
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: test
+  image: golang:1.15.5-buster
+  commands:
+    - make install
+    - make test
+
+trigger:
+  event:
+    - push
+    - pull_request
+  branch:
+    - master
+    - develop
+    - feature/*
+    - bugfix/*
+    - hotfix/*
+
+
+---
+kind: pipeline
+type: docker
+name: notification
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: notify
+  image: mike1pol/drone-rocket
+  settings:
+    url:
+      from_secret: rocket_url
+    user_id:
+      from_secret: rocket_id
+    token:
+      from_secret: rocket_token
+    channel:
+      from_secret: rocket_channel
+    message: |
+      {{#success build.status}}✅{{else}}❌{{/success}} **{{repo.name}}** {{build.status}} build [#{{build.number}} {{build.message}}]({{build.link}}).
+      Commit `{{build.commit}}` by @{{build.author}} on branch/tag `{{build.branch}}`.
+
+depends_on:
+- development
+
+trigger:
+  status:
+  - success
+  - failure
