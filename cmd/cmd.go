@@ -34,7 +34,19 @@ func Execute() {
 		{
 			Name:    "run",
 			Summary: "Runs a Xojo project in debug mode. Example: xojo-ide-com run [OPTIONS] PROJECT_FILE_PATH",
+			Flags: []cli.Flag{
+				cli.FlagInt{
+					Name:    "delay",
+					Summary: "Workaround delay in seconds to wait until the current application is displayed on screen.",
+					Value:   5,
+					Aliases: []string{"d"},
+				},
+			},
 			Handler: func(ctx *cli.CmdContext) error {
+				delay, err := ctx.Flags.Int("delay")
+				if err != nil {
+					return err
+				}
 				// 0. Check for project file path argument
 				if len(ctx.TailArgs) == 0 || ctx.TailArgs[0] == "" {
 					log.Fatalln("xojo project file path was not provided.")
@@ -56,7 +68,7 @@ func Execute() {
 				}
 				defer xo.Close()
 				// 2. Close current project first
-				err := xo.ProjectCmds.Close(func(data []byte, err error) {
+				err = xo.ProjectCmds.Close(func(data []byte, err error) {
 					if err != nil {
 						log.Fatalln(err)
 					}
@@ -79,9 +91,8 @@ func Execute() {
 					}
 					log.Println("data received:", string(data))
 				})
-				// TODO: development purposes only
-				log.Println("Waiting to finish....")
-				time.Sleep(10 * time.Second)
+				log.Printf("waiting %d second(s) for the application...\n", delay)
+				time.Sleep(time.Duration(delay) * time.Second)
 				return err
 			},
 		},
