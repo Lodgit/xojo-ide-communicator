@@ -43,7 +43,7 @@ func Execute() {
 				},
 			},
 			Handler: func(ctx *cli.CmdContext) error {
-				delay, err := ctx.Flags.Int("delay")
+				delay, err := ctx.Flags.Int("delay").Value()
 				if err != nil {
 					return err
 				}
@@ -53,7 +53,7 @@ func Execute() {
 				}
 				// Capture the file path argument and check for a "current working directory" usage
 				filePath := ctx.TailArgs[0]
-				useWorkdir := ctx.AppContext.Flags.IsProvidedFlag("use-current-workdir")
+				useWorkdir := ctx.AppContext.Flags.Bool("use-current-workdir").IsProvided()
 				if useWorkdir {
 					cwd, err := os.Getwd()
 					if err != nil {
@@ -124,7 +124,7 @@ func Execute() {
 				}
 				// Capture the file path argument and check for a "current working directory" usage
 				filePath := ctx.TailArgs[0]
-				useWorkdir := ctx.AppContext.Flags.IsProvidedFlag("use-current-workdir")
+				useWorkdir := ctx.AppContext.Flags.Bool("use-current-workdir").IsProvided()
 				if useWorkdir {
 					cwd, err := os.Getwd()
 					if err != nil {
@@ -133,15 +133,15 @@ func Execute() {
 					filePath = path.Join(cwd, filePath)
 				}
 				// 1. Validate arguments
-				reveal, err := ctx.Flags.Bool("reveal")
+				reveal, err := ctx.Flags.Bool("reveal").Value()
 				if err != nil {
 					return err
 				}
-				osStrSlice := ctx.Flags.StringSlice("os")
+				osStrSlice := ctx.Flags.StringSlice("os").Value()
 				if len(osStrSlice) == 0 {
 					log.Fatalln("no operating system was specified")
 				}
-				archStr := ctx.Flags.String("arch")
+				archStr := ctx.Flags.String("arch").Value()
 				if archStr == "" {
 					log.Fatalln("no architecture was specified")
 				}
