@@ -28,11 +28,12 @@ xojo-ide-com --help
 # COMMANDS:
 #   run      Runs a Xojo project in debug mode. Example: xojo-ide-com run [OPTIONS] PROJECT_FILE_PATH
 #   build    Builds a Xojo project. Example: xojo-ide-com build [OPTIONS] PROJECT_FILE_PATH
+#   test     Runs Xojo project tests after a project has been started via `run` command.
 #
-# Run 'xojo-ide-com COMMAND --help' for more information on a command
+# Run 'xojo-ide-com COMMAND --help' for more information on a comman
 ```
 
-### run
+### Run
 
 It runs a Xojo project in debug mode.
 
@@ -49,7 +50,7 @@ xojo-ide-com run --help
 # Run 'xojo-ide-com run COMMAND --help' for more information on a command
 ```
 
-### build
+### Build
 
 It builds a Xojo project.
 
@@ -66,6 +67,22 @@ xojo-ide-com build --help
 #  -h --help      Prints help information
 #
 # Run 'xojo-ide-com build COMMAND --help' for more information on a command
+```
+
+### Test
+
+Runs Xojo project tests after a project has been started via `run` command.
+
+```sh
+xojo-ide-com test --help
+# NAME: xojo-ide-com test [OPTIONS] COMMAND
+#
+# Runs Xojo project tests after a project has been started via `run` command.
+#
+# OPTIONS:
+#   -h --help    Prints help information
+#
+# Run 'xojo-ide-com test COMMAND --help' for more information on a command
 ```
 
 ## Development

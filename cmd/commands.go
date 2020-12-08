@@ -185,3 +185,15 @@ func BuildCmd() cli.Cmd {
 		},
 	}
 }
+
+// TestCmd defines the Xojo project `test` command.
+func TestCmd() cli.Cmd {
+	return cli.Cmd{
+		Name:    "test",
+		Summary: "Runs Xojo project tests after a project has been started via `run` command.",
+		Handler: func(ctx *cli.CmdContext) error {
+			// TODO: implement Xojo test's requests and responses.
+			return nil
+		},
+	}
+}

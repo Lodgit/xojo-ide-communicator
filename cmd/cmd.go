@@ -30,6 +30,7 @@ func Execute() {
 	app.Commands = []cli.Cmd{
 		RunCmd(),
 		BuildCmd(),
+		TestCmd(),
 	}
 	app.Handler = appHandler
 	if err := app.Run(os.Args); err != nil {
