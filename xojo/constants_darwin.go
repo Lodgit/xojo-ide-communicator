@@ -2,8 +2,8 @@
 
 package xojo
 
-// xojoUnixSocketPath specifies Xojo unix socket path on Darwin systems
-const xojoUnixSocketPath = "/private/tmp/XojoIDE"
+// XojoUnixSocketPath specifies Xojo unix socket path on Darwin systems
+const XojoUnixSocketPath string = "/private/tmp/XojoIDE"
 
-// xojoCommunicationProtocolVersion specifies Xojo IDE communcation protocol
-const xojoCommunicationProtocolVersion = 2
+// XojoCommunicationProtocolVersion specifies Xojo IDE communcation protocol
+const XojoCommunicationProtocolVersion int = 2

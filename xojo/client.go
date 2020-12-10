@@ -14,9 +14,9 @@ type Client struct {
 }
 
 // New creates a new Xojo client instance.
-func New() *Client {
-	sock := goipcc.New(xojoUnixSocketPath)
-	protoVersion := fmt.Sprintf("{\"protocol\":%d}\x00", xojoCommunicationProtocolVersion)
+func New(xojoSocketPath string) *Client {
+	sock := goipcc.New(xojoSocketPath)
+	protoVersion := fmt.Sprintf("{\"protocol\":%d}\x00", XojoCommunicationProtocolVersion)
 	return &Client{
 		sock:         sock,
 		protoVersion: protoVersion,

@@ -43,7 +43,7 @@ func RunCmd() cli.Cmd {
 				filePath = path.Join(cwd, filePath)
 			}
 			// 1. Xojo socket connection
-			xo := xojo.New()
+			xo := xojo.New(xojo.XojoUnixSocketPath)
 			if err := xo.Connect(); err != nil {
 				return err
 			}
@@ -131,7 +131,7 @@ func BuildCmd() cli.Cmd {
 				log.Fatalln("no architecture was specified")
 			}
 			// 2. Xojo socket connection
-			xo := xojo.New()
+			xo := xojo.New(xojo.XojoUnixSocketPath)
 			if err := xo.Connect(); err != nil {
 				return err
 			}

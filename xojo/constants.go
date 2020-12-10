@@ -2,8 +2,8 @@
 
 package xojo
 
-// xojoUnixSocketPath specifies Xojo unix socket path on Linux systems
-const xojoUnixSocketPath = "/tmp/XojoIDE"
+// XojoUnixSocketPath specifies Xojo unix socket path on Linux systems
+const XojoUnixSocketPath = "/tmp/XojoIDE"
 
-// xojoCommunicationProtocolVersion specifies Xojo IDE communcation protocol
-const xojoCommunicationProtocolVersion = 2
+// XojoCommunicationProtocolVersion specifies Xojo IDE communcation protocol
+const XojoCommunicationProtocolVersion = 2
