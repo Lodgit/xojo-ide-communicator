@@ -7,14 +7,8 @@ import (
 	cli "github.com/joseluisq/cline"
 )
 
-// Build-time application values
-var (
-	versionNumber string = "devel"
-	buildTime     string
-)
-
 // Execute is the main entry point of the current application.
-func Execute() {
+func Execute(versionNumber string, buildTime string) {
 	app := cli.New()
 	app.Name = "xojo-ide-com"
 	app.Summary = "CLI client to communicate transparently with Xojo IDE using The Xojo IDE Communication Protocol v2."
@@ -32,12 +26,7 @@ func Execute() {
 		BuildCmd(),
 		TestCmd(),
 	}
-	app.Handler = appHandler
 	if err := app.Run(os.Args); err != nil {
 		log.Fatalln(err)
 	}
-}
-
-func appHandler(ctx *cli.AppContext) error {
-	return nil
 }

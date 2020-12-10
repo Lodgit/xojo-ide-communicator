@@ -4,6 +4,12 @@ import (
 	"xojoidecom/cmd"
 )
 
+// Build-time application values
+var (
+	versionNumber string = "devel"
+	buildTime     string
+)
+
 func main() {
-	cmd.Execute()
+	cmd.Execute(versionNumber, buildTime)
 }
