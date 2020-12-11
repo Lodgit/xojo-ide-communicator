@@ -1,14 +1,11 @@
 package cmd
 
 import (
-	"log"
-	"os"
-
 	cli "github.com/joseluisq/cline"
 )
 
 // Execute is the main entry point of the current application.
-func Execute(versionNumber string, buildTime string) {
+func Execute(args []string, versionNumber string, buildTime string) error {
 	app := cli.New()
 	app.Name = "xojo-ide-com"
 	app.Summary = "CLI client to communicate transparently with Xojo IDE using The Xojo IDE Communication Protocol v2."
@@ -26,7 +23,5 @@ func Execute(versionNumber string, buildTime string) {
 		BuildCmd(),
 		TestCmd(),
 	}
-	if err := app.Run(os.Args); err != nil {
-		log.Fatalln(err)
-	}
+	return app.Run(args)
 }

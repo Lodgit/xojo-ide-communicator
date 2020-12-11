@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+	"os"
 	"xojoidecom/cmd"
 )
 
@@ -11,5 +13,7 @@ var (
 )
 
 func main() {
-	cmd.Execute(versionNumber, buildTime)
+	if err := cmd.Execute(os.Args, versionNumber, buildTime); err != nil {
+		log.Fatalln(err)
+	}
 }
