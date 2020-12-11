@@ -3,19 +3,19 @@ package xojo
 import (
 	"fmt"
 
-	"github.com/joseluisq/goipcc"
+	"github.com/joseluisq/gonetc"
 )
 
 // Client defines the Xojo IDE client communicator.
 type Client struct {
-	sock         *goipcc.IPCSockClient
+	sock         *gonetc.NetClient
 	protoVersion string
 	ProjectCmds  *ProjectCommands
 }
 
 // New creates a new Xojo client instance.
 func New(xojoSocketPath string) *Client {
-	sock := goipcc.New(xojoSocketPath)
+	sock := gonetc.New("unix", xojoSocketPath)
 	protoVersion := fmt.Sprintf("{\"protocol\":%d}\x00", XojoCommunicationProtocolVersion)
 	return &Client{
 		sock:         sock,
