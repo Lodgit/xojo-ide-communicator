@@ -11,8 +11,8 @@ func Test_checkForErrorResponse(t *testing.T) {
 		jsonb []byte
 		err   error
 	}
-	responseOk := []byte("{\"tag\":\"build\",\"script\":\"OpenFile(\\\"%s\\\")\nprint \\\"Project is opened.\\\"\"}\x00")
-	responseErr := []byte("{\"tag\":\"build\",\"response\":{\"openErrors\":[{\"projectError\":{}}]}\"}\x00")
+	responseOk := []byte("{\"tag\":\"build\",\"script\":\"OpenFile(\\\"%s\\\")\nprint \\\"Project is opened.\\\"\"}" + XojoNullChar)
+	responseErr := []byte("{\"tag\":\"build\",\"response\":{\"openErrors\":[{\"projectError\":{}}]}\"}" + XojoNullChar)
 	tests := []struct {
 		name    string
 		args    args

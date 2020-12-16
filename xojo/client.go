@@ -16,7 +16,7 @@ type Client struct {
 // New creates a new Xojo client instance.
 func New(xojoSocketPath string) *Client {
 	sock := gonetc.New("unix", xojoSocketPath)
-	protoVersion := fmt.Sprintf("{\"protocol\":%d}\x00", XojoCommunicationProtocolVersion)
+	protoVersion := fmt.Sprintf("{\"protocol\":%d}%s", XojoCommunicationProtocolVersion, XojoNullChar)
 	return &Client{
 		sock:         sock,
 		protoVersion: protoVersion,

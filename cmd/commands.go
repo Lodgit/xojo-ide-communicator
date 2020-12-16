@@ -1,13 +1,17 @@
 package cmd
 
 import (
+	"bytes"
+	"fmt"
 	"log"
 	"os"
 	"path"
 	"time"
 	"xojoidecom/xojo"
+	"xojoidecom/xojotesting"
 
 	cli "github.com/joseluisq/cline"
+	"github.com/joseluisq/gonetc"
 )
 
 // RunCmd defines the Xojo project `run` command.
@@ -18,12 +22,18 @@ func RunCmd() cli.Cmd {
 		Flags: []cli.Flag{
 			cli.FlagInt{
 				Name:    "delay",
-				Summary: "Workaround delay in seconds to wait until the current application is displayed on screen.",
+				Summary: "Workaround delay in seconds to wait until the current application is finally displayed on screen.",
 				Value:   5,
 				Aliases: []string{"d"},
 			},
+			cli.FlagBool{
+				Name:    "with-tests",
+				Summary: "Run available unit tests through XojoUnit testing server. The testing TCP server should run on " + xojo.XojoTestingServerAddress,
+				Aliases: []string{"t"},
+			},
 		},
 		Handler: func(ctx *cli.CmdContext) error {
+			runTests := ctx.Flags.Bool("with-tests").IsProvided()
 			delay, err := ctx.Flags.Int("delay").Value()
 			if err != nil {
 				return err
@@ -77,6 +87,84 @@ func RunCmd() cli.Cmd {
 			})
 			log.Printf("waiting %d second(s) for the application...\n", delay)
 			time.Sleep(time.Duration(delay) * time.Second)
+			// 5. Run tests if option is available
+			if runTests {
+				// 6. Xojo TCP connection
+				log.Println("running project tests via XojoUnit...")
+				client := gonetc.New("tcp", xojo.XojoTestingServerAddress)
+				if err := client.Connect(); err != nil {
+					log.Println("project XojoUnit Testing server is not available")
+					return err
+				}
+				var testResultb []byte
+				client.Listen(func(data []byte, err error, done func()) {
+					if err != nil {
+						log.Println(err)
+						log.Fatalln(string(data))
+					}
+					testResultb = append(testResultb, data...)
+					if len(data) == 0 || bytes.HasSuffix(data, []byte(xojo.XojoNullChar)) {
+						done()
+					}
+				})
+				// 6.1 Parse JSON test result
+				testResultb = bytes.TrimSuffix(testResultb, []byte(xojo.XojoNullChar))
+				testResult, err := xojotesting.ParseTestResult(testResultb)
+				if err != nil {
+					log.Fatalln(err)
+				}
+				// 6.2 Display test result in readable format
+				fmt.Println()
+				fmt.Printf("     XojoUnit version: %s\n", testResult.XojoUnitVersion)
+				fmt.Printf("     Xojo IDE version: %s\n", testResult.XojoVersion)
+				fmt.Printf("           Start time: %s\n", testResult.StartTime)
+				fmt.Printf("          Total tests: %s\n", testResult.Total)
+				fmt.Printf("         Failed tests: %s\n", testResult.Failures)
+				fmt.Printf("         Passed tests: %s\n", testResult.PassedCount)
+				fmt.Printf("        Skipped tests: %s\n", testResult.Skipped)
+				fmt.Printf("        Skipped tests: %s\n", testResult.NotImplemented)
+				fmt.Printf("Not implemented tests: %s\n", testResult.NotImplemented)
+				fmt.Println()
+				var hasTestsFailed bool = false
+				for _, g := range testResult.Groups {
+					fmt.Printf("=== RUN   %s\n", g.Name)
+					for _, t := range g.Tests {
+						if t.Passed {
+							fmt.Printf("--- PASS: %s/%s (%s)\n", g.Name, t.Name, t.Duration)
+						} else {
+							fmt.Printf("--- FAIL: %s/%s (%s)\n", g.Name, t.Name, t.Duration)
+						}
+					}
+					if g.Failures == 0 {
+						fmt.Printf("PASS: %s (%s)\n", g.Name, g.Duration)
+					} else {
+						hasTestsFailed = true
+						fmt.Printf("FAIL: %s (%s)\n", g.Name, g.Duration)
+					}
+					fmt.Printf("Total tests: %d\n", g.Total)
+					fmt.Printf("Not implemented: %d\n", g.NotImplemented)
+					fmt.Printf("Passed tests: %d\n", g.PassedCount)
+					fmt.Printf("Failed tests: %d\n", g.Failures)
+					fmt.Printf("Skipped tests: %d\n", g.Skipped)
+					fmt.Println()
+				}
+				if hasTestsFailed {
+					fmt.Printf("✗ Tests has been failed.\n")
+					fmt.Println()
+					os.Exit(1)
+				} else {
+					fmt.Println("✓ All tests passed successfully!")
+					fmt.Println()
+				}
+				// 7. Close current project
+				err = xo.ProjectCmds.Close(func(data []byte, err error) {
+					if err != nil {
+						log.Println(err)
+						log.Fatalln(string(data))
+					}
+					log.Println("data received:", string(data))
+				})
+			}
 			return err
 		},
 	}
@@ -182,18 +270,6 @@ func BuildCmd() cli.Cmd {
 				log.Println("data received:", string(data))
 			})
 			return err
-		},
-	}
-}
-
-// TestCmd defines the Xojo project `test` command.
-func TestCmd() cli.Cmd {
-	return cli.Cmd{
-		Name:    "test",
-		Summary: "Runs Xojo project tests after a project has been started via `run` command.",
-		Handler: func(ctx *cli.CmdContext) error {
-			// TODO: implement Xojo test's requests and responses.
-			return nil
 		},
 	}
 }

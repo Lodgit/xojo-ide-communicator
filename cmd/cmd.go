@@ -21,7 +21,6 @@ func Execute(args []string, versionNumber string, buildTime string) error {
 	app.Commands = []cli.Cmd{
 		RunCmd(),
 		BuildCmd(),
-		TestCmd(),
 	}
 	return app.Run(args)
 }
