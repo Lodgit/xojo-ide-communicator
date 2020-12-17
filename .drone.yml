@@ -9,8 +9,11 @@ platform:
 
 steps:
 - name: test
-  image: golang:1.15.5-buster
+  image: golang:1.15.6-buster
   commands:
+    - apt-get update
+    - apt-get install -y socat
+    - socat -V
     - make install
     - make test
 

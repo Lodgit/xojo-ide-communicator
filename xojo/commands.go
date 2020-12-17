@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/joseluisq/goipcc"
+	"github.com/joseluisq/gonetc"
 )
 
 var xojoErrors = [][]byte{
@@ -32,46 +32,40 @@ func checkForErrorResponse(jsonb []byte, err error) ([]byte, error) {
 
 // ProjectCommands defines a command for run a Xojo project.
 type ProjectCommands struct {
-	sock *goipcc.IPCSockClient
+	sock *gonetc.NetClient
 }
 
 // Open opens a specific Xojo project.
 func (c *ProjectCommands) Open(xojoProjectFilePath string, handler func(data []byte, err error)) error {
-	str := fmt.Sprintf("{\"tag\":\"build\",\"script\":\"OpenFile(\\\"%s\\\")\nprint \\\"Project is opened.\\\"\"}\x00", xojoProjectFilePath)
+	str := fmt.Sprintf("{\"tag\":\"build\",\"script\":\"OpenFile(\\\"%s\\\")\nprint \\\"Project is opened.\\\"\"}%s", xojoProjectFilePath, XojoNullChar)
 	log.Println("open project command sent:", str)
-	_, err := c.sock.Write([]byte(str), func(data []byte, err error) {
+	_, err := c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(checkForErrorResponse(data, err))
+		done()
 	})
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Run runs the current opened Xojo project.
 func (c *ProjectCommands) Run(handler func(data []byte, err error)) error {
-	str := "{\"tag\":\"build\",\"script\":\"DoCommand(\\\"RunApp\\\")\nprint \\\"App is running.\\\"\"}\x00"
+	str := "{\"tag\":\"build\",\"script\":\"DoCommand(\\\"RunApp\\\")\nprint \\\"App is running.\\\"\"}" + XojoNullChar
 	log.Println("run project command sent:", str)
-	_, err := c.sock.Write([]byte(str), func(data []byte, err error) {
+	_, err := c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(checkForErrorResponse(data, err))
+		done()
 	})
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Close closes the current opened project.
 func (c *ProjectCommands) Close(handler func(data []byte, err error)) error {
-	str := "{\"tag\":\"build\",\"script\":\"CloseProject(False)\nprint \\\"Default app closed.\\\"\"}\x00"
+	str := "{\"tag\":\"build\",\"script\":\"CloseProject(False)\nprint \\\"Default app closed.\\\"\"}" + XojoNullChar
 	log.Println("close project command sent:", str)
-	_, err := c.sock.Write([]byte(str), func(data []byte, err error) {
+	_, err := c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(checkForErrorResponse(data, err))
+		done()
 	})
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // BuildOptions defines build Xojo project options.
@@ -137,14 +131,12 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 		reveal = "False"
 	}
 
-	str := fmt.Sprintf("{\"script\":\"Print BuildApp(%d,%s)\", \"tag\":\"build\"}\x00", buildType, reveal)
+	str := fmt.Sprintf("{\"script\":\"Print BuildApp(%d,%s)\", \"tag\":\"build\"}%s", buildType, reveal, XojoNullChar)
 	log.Printf("build project options chosen: %s/%s\n", opt.OS, opt.Arch)
 	log.Printf("build project command sent: %s\n", str)
-	_, err := c.sock.Write([]byte(str), func(data []byte, err error) {
+	_, err := c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(checkForErrorResponse(data, err))
+		done()
 	})
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
