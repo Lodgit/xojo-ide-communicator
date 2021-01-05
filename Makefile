@@ -1,5 +1,6 @@
 APP_VERSION ?= 0.0.0
 APP_BUILD_TIME ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+GOOS ?= darwin
 
 install:
 	@go version
@@ -25,6 +26,7 @@ coverage:
 build:
 	@go version
 	@env \
+		GOOS=$(GOOS) \
 		CGO_ENABLED=0 \
 		GO111MODULE=on \
 			go build -v \
