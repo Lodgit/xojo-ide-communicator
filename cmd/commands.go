@@ -233,7 +233,7 @@ func BuildCmd() cli.Cmd {
 				log.Println("data received:", string(data))
 			})
 			// 4. Open the specified project
-			err = xo.ProjectCmds.Open(ctx.TailArgs[0], func(data []byte, err error) {
+			err = xo.ProjectCmds.Open(filePath, func(data []byte, err error) {
 				if err != nil {
 					log.Println(err)
 					log.Fatalln(string(data))
