@@ -1,4 +1,4 @@
-# Xojo IDE Communicator Client
+# Xojo IDE Communicator Client [![Build Status](https://travis-ci.com/Lodgit/xojo-ide-communicator.svg?branch=master)](https://travis-ci.com/Lodgit/xojo-ide-communicator)
 
 > CLI application to communicate transparently with [Xojo IDE](https://www.xojo.com/) via [The Xojo IDE Communication Protocol v2](https://docs.xojo.com/UserGuide:IDE_Communicator).
 
@@ -190,44 +190,60 @@ xojo-ide-com run --with-tests /Users/MyUser/XojoUnit/Desktop\ Project/XojoUnitDe
 
 ### Build
 
-It builds a Xojo project.
+It builds a Xojo project to specific target(s).
 
 ```sh
-xojo-ide-com build --help
+xojo-ide-com build --helps
 # NAME: xojo-ide-com build [OPTIONS] COMMAND
 #
-# Builds a Xojo project. Example: xojo-ide-com build [OPTIONS] PROJECT_FILE_PATH
+# Builds a Xojo project to specific target(s). Example: xojo-ide-com build [OPTIONS] PROJECT_FILE_PATH
 #
 # OPTIONS:
-#     --os        Operating system target(s) such as `linux`, `darwin`, `windows` and `ios`. For multiple targets use a coma-separated list.
-#     --arch      Target architecture such as `i386`, `amd64` and `arm64`.
-#     --reveal    Open the built application directory using the operating system file manager available. [default: false]
+#  -t --targets    Operating systems with their architectures. Coma-separated list with one or more target pairs in lower case. E.g linux-amd64,darwin-arm64,windows-i386.
+#  -r --reveal    Open the built application directory using the operating system file manager available. [default: false]
 #  -h --help      Prints help information
 #
 # Run 'xojo-ide-com build COMMAND --help' for more information on a command
 ```
 
+#### Targets supported
+
+The following list describe operating system and architecture combination pairs supported by `--targets` option.
+
+| **Operating system** | **amd64**       | **arm64**      | **i386**       |
+| -------------------- | --------------- | -------------- | -------------- |
+| Linux                | `linux-amd64`   | `linux-arm64`  | `linux-i386`   |
+| macOS                | `darwin-amd64`  | `darwin-arm64` | `darwin-i386`  |
+| Windows              | `windows-amd64` | ?              | `windows-i386` |
+| iOS                  | `ios-amd64`     | `ios-arm64`    | ?              |
+
+More details at https://docs.xojo.com/UserGuide:IDE_Scripting_Building_Commands
+
 #### Usage
 
-The following command opens a local Xojo project and build 64-bit executables for MacOs and Windows.
+The following command opens a local Xojo project and build executables for Linux (amd64), MacOs (arm64) and Windows (i386).
 
 ```sh
-xojo-ide-com build --os darwin,windows --arch amd64 /Users/MyUser/XojoUnit/Desktop\ Project/XojoUnitDesktop.xojo_project
-# 2020/12/17 12:32:05 close project command sent: {"tag":"build","script":"CloseProject(False)
+xojo-ide-com build --targets linux-amd64,darwin-arm64,windows-i386 \
+    /Users/MyUser/XojoUnit/Desktop\ Project/XojoUnitDesktop.xojo_project
+# 2021/01/06 10:52:07 close project command sent: {"tag":"build","script":"CloseProject(False)
 # print \"Default app closed.\""}
-# 2020/12/17 12:32:05 data received: {"tag":"build","response":"Default app closed."}
-# 2020/12/17 12:32:05 open project command sent: {"tag":"build","script":"OpenFile(\"/Users/MyUser/Desktop Project/XojoUnitDesktop.xojo_project\")
+# 2021/01/06 10:52:07 data received: {"tag":"build","response":"Default app closed."}
+# 2021/01/06 10:52:07 open project command sent: {"tag":"build","script":"OpenFile(\"/Users/MyUser/XojoUnit/Desktop Project/XojoUnitDesktop.xojo_project\")
 # print \"Project is opened.\""}
-# 2020/12/17 12:32:07 data received: {"tag":"build","response":"Project is opened."}
-# 2020/12/17 12:32:07 build project options chosen: darwin/amd64
-# 2020/12/17 12:32:07 build project command sent: {"script":"Print BuildApp(16,False)", "tag":"build"}
-# 2020/12/17 12:32:11 data received: {"tag":"build","response":"\/Users\/MyUser\/XojoUnit\/Desktop\\ Project\/Builds\\ \\-\\ XojoUnitDesktop\/OS\\ X\\ 64\\ bit\/XojoUnit.app"}
-# 2020/12/17 12:32:11 build project options chosen: windows/amd64
-# 2020/12/17 12:32:11 build project command sent: {"script":"Print BuildApp(19,False)", "tag":"build"}
-# 2020/12/17 12:32:16 data received: {"tag":"build","response":"\/Users\/MyUser\/XojoUnit\/Desktop\\ Project\/Builds\\ \\-\\ XojoUnitDesktop\/Windows\\ 64\\ bit\/XojoUnit\/XojoUnit.exe"}
-# 2020/12/17 12:32:16 close project command sent: {"tag":"build","script":"CloseProject(False)
+# 2021/01/06 10:52:09 data received: {"tag":"build","response":"Project is opened."}
+# 2021/01/06 10:52:09 build project options chosen: linux/amd64
+# 2021/01/06 10:52:09 build project command sent: {"script":"Print BuildApp(17,False)", "tag":"build"}
+# 2021/01/06 10:52:13 data received: {"tag":"build","response":"\/Users\/MyUser\/XojoUnit\/Desktop\\ Project\/Builds\\ \\-\\ XojoUnitDesktop\/Linux\\ 64\\ bit\/# XojoUnit\/XojoUnit"}
+# 2021/01/06 10:52:13 build project options chosen: darwin/arm64
+# 2021/01/06 10:52:13 build project command sent: {"script":"Print BuildApp(24,False)", "tag":"build"}
+# 2021/01/06 10:52:19 data received: {"tag":"build","response":"\/Users\/MyUser\/XojoUnit\/Desktop\\ Project\/Builds\\ \\-\\ XojoUnitDesktop\/macOS\\ ARM\\ # 64\\ bit\/XojoUnit.app"}
+# 2021/01/06 10:52:19 build project options chosen: windows/i386
+# 2021/01/06 10:52:19 build project command sent: {"script":"Print BuildApp(3,False)", "tag":"build"}
+# 2021/01/06 10:52:21 data received: {"tag":"build","response":"\/Users\/MyUser\/XojoUnit\/Desktop\\ Project\/Builds\\ \\-\\ XojoUnitDesktop\/Windows\/# XojoUnit\/XojoUnit.exe"}
+# 2021/01/06 10:52:21 close project command sent: {"tag":"build","script":"CloseProject(False)
 # print \"Default app closed.\""}
-# 2020/12/17 12:32:16 data received: {"tag":"build","response":"Default app closed."}
+# 2021/01/06 10:52:21 data received: {"tag":"build","response":"Default app closed."}
 ```
 
 ## Development

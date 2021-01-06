@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/joseluisq/gonetc"
 )
@@ -70,10 +71,8 @@ func (c *ProjectCommands) Close(handler func(data []byte, err error)) error {
 
 // BuildOptions defines build Xojo project options.
 type BuildOptions struct {
-	// Target operating system
-	OS string
-	// Target architecture
-	Arch string
+	// Operating system and architecture target pair. E.g linux-amd64
+	Target string
 	// If reveal is true then the built app is displayed using the OS file manager.
 	Reveal bool
 }
@@ -95,33 +94,43 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 	// 19 		Windows				64-bit		Intel
 	// 24 		macOS				64-bit		ARM
 
+	target := strings.Split(opt.Target, "-")
+	if len(target) == 0 {
+		return fmt.Errorf("one build target was not provided or empty")
+	}
+	if len(target) < 2 || len(target) > 2 {
+		return fmt.Errorf("one build target has not valid `os-arch` pair value")
+	}
+	vos := strings.TrimSpace(target[0])
+	varch := strings.TrimSpace(target[1])
+
 	var buildType int
-	if opt.OS == "windows" && opt.Arch == "i386" {
-		buildType = 3
-	}
-	if opt.OS == "windows" && opt.Arch == "amd64" {
-		buildType = 19
-	}
-	if opt.OS == "darwin" && opt.Arch == "amd64" {
-		buildType = 16
-	}
-	if opt.OS == "darwin" && opt.Arch == "arm64" {
-		buildType = 24
-	}
-	if opt.OS == "linux" && opt.Arch == "i386" {
+	if vos == "linux" && varch == "i386" {
 		buildType = 4
 	}
-	if opt.OS == "linux" && opt.Arch == "amd64" {
+	if vos == "linux" && varch == "amd64" {
 		buildType = 17
 	}
-	if opt.OS == "ios" && opt.Arch == "amd64" {
+	if vos == "darwin" && varch == "amd64" {
+		buildType = 16
+	}
+	if vos == "darwin" && varch == "arm64" {
+		buildType = 24
+	}
+	if vos == "windows" && varch == "i386" {
+		buildType = 3
+	}
+	if vos == "windows" && varch == "amd64" {
+		buildType = 19
+	}
+	if vos == "ios" && varch == "amd64" {
 		buildType = 14
 	}
-	if opt.OS == "ios" && opt.Arch == "arm64" {
+	if vos == "ios" && varch == "arm64" {
 		buildType = 15
 	}
 	if buildType == 0 {
-		return fmt.Errorf("Xojo build options provided were not specified or unsupported")
+		return fmt.Errorf("build target `%s-%s` is not supported by Xojo", vos, varch)
 	}
 
 	var reveal string
@@ -132,7 +141,7 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 	}
 
 	str := fmt.Sprintf("{\"script\":\"Print BuildApp(%d,%s)\", \"tag\":\"build\"}%s", buildType, reveal, XojoNullChar)
-	log.Printf("build project options chosen: %s/%s\n", opt.OS, opt.Arch)
+	log.Printf("build project options chosen: %s/%s\n", vos, varch)
 	log.Printf("build project command sent: %s\n", str)
 	_, err := c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(checkForErrorResponse(data, err))

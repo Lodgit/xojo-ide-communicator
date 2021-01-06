@@ -174,20 +174,18 @@ func RunCmd() cli.Cmd {
 func BuildCmd() cli.Cmd {
 	return cli.Cmd{
 		Name:    "build",
-		Summary: "Builds a Xojo project. Example: xojo-ide-com build [OPTIONS] PROJECT_FILE_PATH",
+		Summary: "Builds a Xojo project to specific target(s). Example: xojo-ide-com build [OPTIONS] PROJECT_FILE_PATH",
 		Flags: []cli.Flag{
 			cli.FlagStringSlice{
-				Name:    "os",
-				Summary: "Operating system target(s) such as `linux`, `darwin`, `windows` and `ios`. For multiple targets use a coma-separated list.",
-			},
-			cli.FlagString{
-				Name:    "arch",
-				Summary: "Target architecture such as `i386`, `amd64` and `arm64`.",
+				Name:    "targets",
+				Summary: "Operating systems with their architectures. Coma-separated list with one or more target pairs in lower case. E.g linux-amd64,darwin-arm64,windows-i386.",
+				Aliases: []string{"t"},
 			},
 			cli.FlagBool{
 				Name:    "reveal",
 				Value:   false,
 				Summary: "Open the built application directory using the operating system file manager available.",
+				Aliases: []string{"r"},
 			},
 		},
 		Handler: func(ctx *cli.CmdContext) error {
@@ -210,13 +208,9 @@ func BuildCmd() cli.Cmd {
 			if err != nil {
 				return err
 			}
-			osStrSlice := ctx.Flags.StringSlice("os").Value()
-			if len(osStrSlice) == 0 {
-				log.Fatalln("no operating system was specified")
-			}
-			archStr := ctx.Flags.String("arch").Value()
-			if archStr == "" {
-				log.Fatalln("no architecture was specified")
+			targets := ctx.Flags.StringSlice("targets").Value()
+			if len(targets) == 0 {
+				log.Fatalln("no build tagets specified. Use --targets option")
 			}
 			// 2. Xojo socket connection
 			xo := xojo.New(xojo.XojoUnixSocketPath)
@@ -244,10 +238,9 @@ func BuildCmd() cli.Cmd {
 				log.Fatalln(err)
 			}
 			// 5. Build the specified project for each operating system(s) chosen
-			for _, osStr := range osStrSlice {
+			for _, target := range targets {
 				opts := xojo.BuildOptions{
-					OS:     osStr,
-					Arch:   archStr,
+					Target: target,
 					Reveal: reveal,
 				}
 				err = xo.ProjectCmds.Build(opts, func(data []byte, err error) {
