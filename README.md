@@ -1,4 +1,4 @@
-# Xojo IDE Communicator Client [![Build Status](https://travis-ci.com/Lodgit/xojo-ide-communicator.svg?branch=master)](https://travis-ci.com/Lodgit/xojo-ide-communicator)
+# Xojo IDE Communicator Client ![CI](https://github.com/Lodgit/xojo-ide-communicator/workflows/CI/badge.svg)
 
 > CLI application to communicate transparently with [Xojo IDE](https://www.xojo.com/) via [The Xojo IDE Communication Protocol v2](https://docs.xojo.com/UserGuide:IDE_Communicator).
 

@@ -7,4 +7,5 @@ vendor
 *.bin
 .vscode
 **/.DS_Store
+coverage*
 TODO

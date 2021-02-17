@@ -9,7 +9,7 @@ platform:
 
 steps:
 - name: test
-  image: golang:1.15.6-buster
+  image: golang:1.16.0-buster
   commands:
     - apt-get update
     - apt-get install -y socat
@@ -37,6 +37,9 @@ name: notification
 platform:
   os: linux
   arch: amd64
+
+clone:
+  disable: true
 
 steps:
 - name: notify
