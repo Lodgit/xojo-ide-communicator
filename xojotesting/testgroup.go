@@ -38,8 +38,6 @@ type TestResult struct {
 
 // ParseTestResult parses JSON bytes of a XojoUnit result and return the corresponding TestResult object.
 func ParseTestResult(jsonb []byte) (testResult TestResult, err error) {
-	if err := json.Unmarshal(jsonb, &testResult); err != nil {
-		return testResult, err
-	}
-	return testResult, nil
+	err = json.Unmarshal(jsonb, &testResult)
+	return
 }

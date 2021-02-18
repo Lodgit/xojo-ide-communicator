@@ -27,16 +27,13 @@ func New(xojoSocketPath string) *Client {
 }
 
 // Connect tries to connect to Xojo IDE socket and sets the Xojo communication protocol.
-func (c *Client) Connect() error {
-	err := c.sock.Connect()
+func (c *Client) Connect() (err error) {
+	err = c.sock.Connect()
 	if err != nil {
-		return err
+		return
 	}
 	_, err = c.sock.Write([]byte(c.protoVersion), nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	return
 }
 
 // Close closes the current Xojo IDE socket.

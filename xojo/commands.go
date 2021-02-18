@@ -9,6 +9,7 @@ import (
 	"github.com/joseluisq/gonetc"
 )
 
+// xojoErrors defines Xojo error types to be checked.
 var xojoErrors = [][]byte{
 	[]byte("buildError"),
 	[]byte("loadError"),
@@ -17,18 +18,21 @@ var xojoErrors = [][]byte{
 }
 
 // checkForErrorResponse just checks many possible errors during commands execution.
-func checkForErrorResponse(jsonb []byte, err error) ([]byte, error) {
+func checkForErrorResponse(inJsonb []byte, inErr error) (jsonb []byte, err error) {
+	err = inErr
 	if err != nil {
-		return nil, err
+		return
 	}
-	for _, e := range xojoErrors {
-		if bytes.Contains(jsonb, e) {
-			return jsonb, fmt.Errorf(
+	jsonb = inJsonb
+	for _, errb := range xojoErrors {
+		if bytes.Contains(inJsonb, errb) {
+			err = fmt.Errorf(
 				"Xojo IDE commands execution error occurred, please check the response output",
 			)
+			return
 		}
 	}
-	return jsonb, nil
+	return
 }
 
 // ProjectCommands defines a command for run a Xojo project.
@@ -37,36 +41,36 @@ type ProjectCommands struct {
 }
 
 // Open opens a specific Xojo project.
-func (c *ProjectCommands) Open(xojoProjectFilePath string, handler func(data []byte, err error)) error {
+func (c *ProjectCommands) Open(xojoProjectFilePath string, handler func(data []byte, err error)) (err error) {
 	str := fmt.Sprintf("{\"tag\":\"build\",\"script\":\"OpenFile(\\\"%s\\\")\nprint \\\"Project is opened.\\\"\"}%s", xojoProjectFilePath, XojoNullChar)
 	log.Println("open project command sent:", str)
-	_, err := c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
+	_, err = c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(checkForErrorResponse(data, err))
 		done()
 	})
-	return err
+	return
 }
 
 // Run runs the current opened Xojo project.
-func (c *ProjectCommands) Run(handler func(data []byte, err error)) error {
+func (c *ProjectCommands) Run(handler func(data []byte, err error)) (err error) {
 	str := "{\"tag\":\"build\",\"script\":\"DoCommand(\\\"RunApp\\\")\nprint \\\"App is running.\\\"\"}" + XojoNullChar
 	log.Println("run project command sent:", str)
-	_, err := c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
+	_, err = c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(checkForErrorResponse(data, err))
 		done()
 	})
-	return err
+	return
 }
 
 // Close closes the current opened project.
-func (c *ProjectCommands) Close(handler func(data []byte, err error)) error {
+func (c *ProjectCommands) Close(handler func(data []byte, err error)) (err error) {
 	str := "{\"tag\":\"build\",\"script\":\"CloseProject(False)\nprint \\\"Default app closed.\\\"\"}" + XojoNullChar
 	log.Println("close project command sent:", str)
-	_, err := c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
+	_, err = c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(checkForErrorResponse(data, err))
 		done()
 	})
-	return err
+	return
 }
 
 // BuildOptions defines build Xojo project options.
@@ -78,7 +82,7 @@ type BuildOptions struct {
 }
 
 // Build builds current opened Xojo project.
-func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err error)) error {
+func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err error)) (err error) {
 	// IDE Scripting building options
 	// https://docs.xojo.com/UserGuide:IDE_Scripting_Building_Commands
 	// Value	Build Target		32/64-bit	Architecture
@@ -96,10 +100,12 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 
 	target := strings.Split(opt.Target, "-")
 	if len(target) == 0 {
-		return fmt.Errorf("one build target was not provided or empty")
+		err = fmt.Errorf("one build target was not provided or empty")
+		return
 	}
 	if len(target) < 2 || len(target) > 2 {
-		return fmt.Errorf("one build target has not valid `os-arch` pair value")
+		err = fmt.Errorf("one build target has not valid `os-arch` pair value")
+		return
 	}
 	vos := strings.TrimSpace(target[0])
 	varch := strings.TrimSpace(target[1])
@@ -130,7 +136,8 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 		buildType = 15
 	}
 	if buildType == 0 {
-		return fmt.Errorf("build target `%s-%s` is not supported by Xojo", vos, varch)
+		err = fmt.Errorf("build target `%s-%s` is not supported by Xojo", vos, varch)
+		return
 	}
 
 	var reveal string
@@ -143,9 +150,9 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 	str := fmt.Sprintf("{\"script\":\"Print BuildApp(%d,%s)\", \"tag\":\"build\"}%s", buildType, reveal, XojoNullChar)
 	log.Printf("build project options chosen: %s/%s\n", vos, varch)
 	log.Printf("build project command sent: %s\n", str)
-	_, err := c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
+	_, err = c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(checkForErrorResponse(data, err))
 		done()
 	})
-	return err
+	return
 }
