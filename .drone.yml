@@ -55,7 +55,7 @@ steps:
       from_secret: rocket_channel
     message: |
       {{#success build.status}}✅{{else}}❌{{/success}} **{{repo.name}}** {{build.status}} build [#{{build.number}} {{build.message}}]({{build.link}}).
-      Commit `{{build.commit}}` by @{{build.author}} on branch/tag `{{build.branch}}`.
+      Commit `{{build.commit}}` by `{{build.author}}` on branch/tag `{{build.branch}}`.
 
 depends_on:
 - development
