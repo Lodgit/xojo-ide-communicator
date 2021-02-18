@@ -178,7 +178,7 @@ func BuildCmd() cli.Cmd {
 		Flags: []cli.Flag{
 			cli.FlagStringSlice{
 				Name:    "targets",
-				Summary: "Operating systems with their architectures. Coma-separated list with one or more target pairs in lower case. E.g linux-amd64,darwin-arm64,windows-i386.",
+				Summary: "Operating systems with their architectures. Coma-separated list with one or more target pairs in lower case. E.g linux-amd64,darwin-arm64,windows-386.",
 				Aliases: []string{"t"},
 			},
 			cli.FlagBool{

@@ -199,7 +199,7 @@ xojo-ide-com build --helps
 # Builds a Xojo project to specific target(s). Example: xojo-ide-com build [OPTIONS] PROJECT_FILE_PATH
 #
 # OPTIONS:
-#  -t --targets    Operating systems with their architectures. Coma-separated list with one or more target pairs in lower case. E.g linux-amd64,darwin-arm64,windows-i386.
+#  -t --targets    Operating systems with their architectures. Coma-separated list with one or more target pairs in lower case. E.g linux-amd64,darwin-arm64,windows-386.
 #  -r --reveal    Open the built application directory using the operating system file manager available. [default: false]
 #  -h --help      Prints help information
 #
@@ -210,21 +210,21 @@ xojo-ide-com build --helps
 
 The following list describe operating system and architecture combination pairs supported by `--targets` option.
 
-| **Operating system** | **amd64**       | **arm64**      | **i386**       |
-| -------------------- | --------------- | -------------- | -------------- |
-| Linux                | `linux-amd64`   | `linux-arm64`  | `linux-i386`   |
-| macOS                | `darwin-amd64`  | `darwin-arm64` | `darwin-i386`  |
-| Windows              | `windows-amd64` | ?              | `windows-i386` |
-| iOS                  | `ios-amd64`     | `ios-arm64`    | ?              |
+| **Operating system** | **amd64**       | **386**       | **arm64**      |
+| -------------------- | --------------- | ------------- | -------------- |
+| Linux                | `linux-amd64`   | `linux-386`   | `linux-arm64`  |
+| macOS                | `darwin-amd64`  | `darwin-386`  | `darwin-arm64` |
+| Windows              | `windows-amd64` | `windows-386` | ?              |
+| iOS                  | `ios-amd64`     | ?             | `ios-arm64`    |
 
 More details at https://docs.xojo.com/UserGuide:IDE_Scripting_Building_Commands
 
 #### Usage
 
-The following command opens a local Xojo project and build executables for Linux (amd64), MacOs (arm64) and Windows (i386).
+The following command opens a local Xojo project and build executables for Linux (amd64), MacOs (arm64) and Windows (386).
 
 ```sh
-xojo-ide-com build --targets linux-amd64,darwin-arm64,windows-i386 \
+xojo-ide-com build --targets linux-amd64,darwin-arm64,windows-386 \
     /Users/MyUser/XojoUnit/Desktop\ Project/XojoUnitDesktop.xojo_project
 # 2021/01/06 10:52:07 close project command sent: {"tag":"build","script":"CloseProject(False)
 # print \"Default app closed.\""}
@@ -238,7 +238,7 @@ xojo-ide-com build --targets linux-amd64,darwin-arm64,windows-i386 \
 # 2021/01/06 10:52:13 build project options chosen: darwin/arm64
 # 2021/01/06 10:52:13 build project command sent: {"script":"Print BuildApp(24,False)", "tag":"build"}
 # 2021/01/06 10:52:19 data received: {"tag":"build","response":"\/Users\/MyUser\/XojoUnit\/Desktop\\ Project\/Builds\\ \\-\\ XojoUnitDesktop\/macOS\\ ARM\\ # 64\\ bit\/XojoUnit.app"}
-# 2021/01/06 10:52:19 build project options chosen: windows/i386
+# 2021/01/06 10:52:19 build project options chosen: windows/386
 # 2021/01/06 10:52:19 build project command sent: {"script":"Print BuildApp(3,False)", "tag":"build"}
 # 2021/01/06 10:52:21 data received: {"tag":"build","response":"\/Users\/MyUser\/XojoUnit\/Desktop\\ Project\/Builds\\ \\-\\ XojoUnitDesktop\/Windows\/# XojoUnit\/XojoUnit.exe"}
 # 2021/01/06 10:52:21 close project command sent: {"tag":"build","script":"CloseProject(False)
@@ -268,11 +268,19 @@ make test
 
 ## Production
 
-### Build
+### Single build
 
 ```sh
 make build
 ```
+
+### Multiple builds and archiving
+
+```sh
+make release
+```
+
+See `Makefile` for more details
 
 ## Resources
 

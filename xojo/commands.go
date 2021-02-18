@@ -111,7 +111,7 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 	varch := strings.TrimSpace(target[1])
 
 	var buildType int
-	if vos == "linux" && varch == "i386" {
+	if vos == "linux" && varch == "386" {
 		buildType = 4
 	}
 	if vos == "linux" && varch == "amd64" {
@@ -123,7 +123,7 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 	if vos == "darwin" && varch == "arm64" {
 		buildType = 24
 	}
-	if vos == "windows" && varch == "i386" {
+	if vos == "windows" && varch == "386" {
 		buildType = 3
 	}
 	if vos == "windows" && varch == "amd64" {
