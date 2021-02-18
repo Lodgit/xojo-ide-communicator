@@ -87,8 +87,6 @@ release:
 	@make build GOOS=darwin GOARCH=arm64 ARCHIVE=true
 	@make build GOOS=linux GOARCH=amd64 ARCHIVE=true
 	@make build GOOS=linux GOARCH=arm64 ARCHIVE=true
-	@make build GOOS=windows GOARCH=amd64 ARCHIVE=true
-	@make build GOOS=windows GOARCH=386 ARCHIVE=true
 	@echo "Building release binaries done successfully!"
 	@ls -ogh $(BUILD_DIR)
 	@echo

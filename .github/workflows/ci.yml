@@ -7,15 +7,16 @@ env:
   GOPROXY: "https://proxy.golang.org"
 
 jobs:
-  test:
-    name: Testing
+  linux:
+    name: Testing (linux)
     strategy:
       fail-fast: false
       matrix:
         go: [1.15.x, 1.16.x]
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os}}
+    runs-on: ubuntu-latest
     steps:
+      - name: Dependencies
+        run: sudo apt-get install socat
       - name: Install
         uses: actions/setup-go@v1
         with:
@@ -23,7 +24,54 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Tests
-        run: go test -v -timeout 30s -race -coverprofile=coverage.txt -covermode=atomic ./...
+        run: go test $(go list ./... | grep -v /examples) -v -timeout 30s -race -coverprofile=coverage.txt -covermode=atomic
+      - name: Coverage
+        uses: codecov/codecov-action@v1
+        with:
+          flags: unittests
+          name: codecov-gonetc
+      - name: Environment
+        id: vars
+        run: |
+          printf "Using go at: $(which go)\n"
+          printf "Go version: $(go version)\n"
+          printf "\n\nGo environment:\n\n"
+          go env
+          printf "\n\nSystem environment:\n\n"
+          env
+          # Calculate the short SHA1 hash of the git commit
+          echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
+          echo "::set-output name=go_cache::$(go env GOCACHE)"
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.vars.outputs.go_cache }}
+          key: ${{ runner.os }}-${{ matrix.go }}-go-ci-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.go }}-go-ci
+  darwin:
+    name: Testing (darwin)
+    strategy:
+      fail-fast: false
+      matrix:
+        go: [1.15.x, 1.16.x]
+    runs-on: macos-latest
+    steps:
+      - name: Dependencies
+        run: brew install socat
+      - name: Install
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Tests
+        run: go test $(go list ./... | grep -v /examples) -v -timeout 30s -race -coverprofile=coverage.txt -covermode=atomic
+      - name: Coverage
+        uses: codecov/codecov-action@v1
+        with:
+          flags: unittests
+          name: codecov-gonetc
       - name: Environment
         id: vars
         run: |
