@@ -1,17 +1,16 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"os"
 	"path"
+	"strings"
 	"time"
 	"xojoidecom/xojo"
 	"xojoidecom/xojotesting"
 
 	cli "github.com/joseluisq/cline"
-	"github.com/joseluisq/gonetc"
 )
 
 // RunCmd defines the Xojo project `run` command.
@@ -40,7 +39,7 @@ func RunCmd() cli.Cmd {
 			}
 			// 0. Check for project file path argument
 			if len(ctx.TailArgs) == 0 || ctx.TailArgs[0] == "" {
-				log.Fatalln("xojo project file path was not provided.")
+				log.Fatalln("Xojo project file path was not provided.")
 			}
 			// Capture the file path argument and check for a "current working directory" usage
 			filePath := ctx.TailArgs[0]
@@ -85,45 +84,62 @@ func RunCmd() cli.Cmd {
 				}
 				log.Println("data received:", string(data))
 			})
-			log.Printf("waiting %d second(s) for the application...\n", delay)
+			log.Printf("Waiting %d second(s) for the application's start...\n", delay)
 			time.Sleep(time.Duration(delay) * time.Second)
 			// 5. Run tests if option is available
 			if runTests {
-				// 6. Xojo TCP connection
-				log.Println("running project tests via XojoUnit...")
-				client := gonetc.New("tcp", xojo.XojoTestingServerAddress)
+				// 6. Xojo TCP connection with Testing server
+				log.Println("Running project tests via XojoUnit...")
+				client := xojotesting.New(xojo.XojoTestingServerAddress)
 				if err := client.Connect(); err != nil {
 					log.Println("project XojoUnit Testing server is not available")
 					return err
 				}
-				var testResultb []byte
-				client.Listen(func(data []byte, err error, done func()) {
+				// 6.1. Listen, receive one response only and parse the JSON test results
+				testResultb, err := client.Listen()
+				if err != nil {
+					log.Println("XojoUnit Testing server communication error")
+					return err
+				}
+
+				// 6.2. Check for incoming Xojo runtime errors on tests
+				testResultb, err = xojotesting.CheckForGlobalErrorResponse(testResultb, nil)
+				if err != nil {
+					log.Println("XojoUnit Testing server responses with a Xojo runtime error")
+					runtimeErrResult, err := xojotesting.ParseRuntimeErrorResult(testResultb)
 					if err != nil {
-						log.Println(err)
-						log.Fatalln(string(data))
+						log.Println("Can not parse XojoUnit Testing server \"Runtime Error\" response")
+						return err
 					}
-					testResultb = append(testResultb, data...)
-					if len(data) == 0 || bytes.HasSuffix(data, []byte(xojo.XojoNullChar)) {
-						done()
+					runtimeErr := runtimeErrResult.RuntimeError
+					fmt.Printf("   Error Type: %s\n", runtimeErr.ErrorType)
+					fmt.Printf(" Error Number: %d\n", runtimeErr.ErrorNumber)
+					fmt.Printf("Error Message: %s\n", runtimeErr.ErrorMessage)
+					fmt.Printf(" Error Reason: %s\n", runtimeErr.ErrorReason)
+					fmt.Printf("  Error Stack:\n")
+					for i, s := range runtimeErr.ErrorStack {
+						if s != "" {
+							fmt.Printf("            %d: %s\n", i, s)
+						}
 					}
-				})
-				// 6.1 Parse JSON test result
-				testResultb = bytes.TrimSuffix(testResultb, []byte(xojo.XojoNullChar))
+					fmt.Println()
+					fmt.Printf("✗ XojoUnit Testing server has been failed.\n")
+					fmt.Println()
+					os.Exit(1)
+				}
+
 				testResult, err := xojotesting.ParseTestResult(testResultb)
 				if err != nil {
-					log.Fatalln(err)
+					log.Println("Can not parse XojoUnit Testing server \"Test Results\" response")
+					return err
 				}
-				// 6.2 Display test result in readable format
+				// 6.3. Display test result in readable format
 				fmt.Println()
-				fmt.Printf("     XojoUnit version: %s\n", testResult.XojoUnitVersion)
-				fmt.Printf("     Xojo IDE version: %s\n", testResult.XojoVersion)
-				fmt.Printf("           Start time: %s\n", testResult.StartTime)
-				fmt.Printf("          Total tests: %s\n", testResult.Total)
-				fmt.Printf("         Failed tests: %s\n", testResult.Failures)
-				fmt.Printf("         Passed tests: %s\n", testResult.PassedCount)
-				fmt.Printf("        Skipped tests: %s\n", testResult.Skipped)
-				fmt.Printf("        Skipped tests: %s\n", testResult.NotImplemented)
-				fmt.Printf("Not implemented tests: %s\n", testResult.NotImplemented)
+				fmt.Println(" XojoUnit Testing Server")
+				fmt.Println("=========================")
+				fmt.Printf("XojoUnit version: %s\n", testResult.XojoUnitVersion)
+				fmt.Printf("Xojo IDE version: %s\n", testResult.XojoVersion)
+				fmt.Printf("      Start time: %s\n", testResult.StartTime)
 				fmt.Println()
 				var hasTestsFailed bool = false
 				for _, g := range testResult.Groups {
@@ -131,32 +147,60 @@ func RunCmd() cli.Cmd {
 					for _, t := range g.Tests {
 						if t.Passed {
 							fmt.Printf("--- PASS: %s/%s (%s)\n", g.Name, t.Name, t.Duration)
-						} else {
+						} else if t.Type == "failed" {
 							fmt.Printf("--- FAIL: %s/%s (%s)\n", g.Name, t.Name, t.Duration)
+							fmt.Printf("             %s\n", strings.ReplaceAll(t.FailedMessage, "\n", "\n             "))
+
+							// Check for a RuntimeError in current TestResult if it's present
+							if t.RuntimeError.ErrorType != "" {
+								fmt.Printf("   Error Type: %s\n", t.RuntimeError.ErrorType)
+								fmt.Printf(" Error Number: %d\n", t.RuntimeError.ErrorNumber)
+								fmt.Printf("Error Message: %s\n", t.RuntimeError.ErrorMessage)
+								fmt.Printf(" Error Reason: %s\n", t.RuntimeError.ErrorReason)
+								fmt.Printf("  Error Stack:\n")
+								for i, s := range t.RuntimeError.ErrorStack {
+									if s != "" {
+										fmt.Printf("            %d: %s\n", i, s)
+									}
+								}
+							}
+						} else {
+							fmt.Printf("--- SKIP: %s/%s (%s)\n", g.Name, t.Name, t.Duration)
 						}
 					}
-					if g.Failures == 0 {
+					if g.FailuresCount == 0 {
 						fmt.Printf("PASS: %s (%s)\n", g.Name, g.Duration)
 					} else {
 						hasTestsFailed = true
 						fmt.Printf("FAIL: %s (%s)\n", g.Name, g.Duration)
 					}
 					fmt.Printf("Total tests: %d\n", g.Total)
-					fmt.Printf("Not implemented: %d\n", g.NotImplemented)
+					fmt.Printf("Not implemented: %d\n", g.NotImplementedCount)
 					fmt.Printf("Passed tests: %d\n", g.PassedCount)
-					fmt.Printf("Failed tests: %d\n", g.Failures)
-					fmt.Printf("Skipped tests: %d\n", g.Skipped)
+					fmt.Printf("Failed tests: %d\n", g.FailuresCount)
+					fmt.Printf("Skipped tests: %d\n", g.SkippedCount)
 					fmt.Println()
 				}
+
+				fmt.Println("Final test results:")
+				fmt.Printf("          Total tests: %s\n", testResult.Total)
+				fmt.Printf("         Failed tests: %s\n", testResult.FailuresCount)
+				fmt.Printf("         Passed tests: %s\n", testResult.PassedCount)
+				fmt.Printf("        Skipped tests: %s\n", testResult.SkippedCount)
+				fmt.Printf("        Skipped tests: %s\n", testResult.NotImplementedCount)
+				fmt.Printf("Not implemented tests: %s\n", testResult.NotImplementedCount)
+				fmt.Println()
+
 				if hasTestsFailed {
-					fmt.Printf("✗ Tests has been failed.\n")
+					fmt.Printf("✗ Tests has been failed / %s\n", testResult.FailuresCount)
 					fmt.Println()
 					os.Exit(1)
 				} else {
 					fmt.Println("✓ All tests passed successfully!")
 					fmt.Println()
 				}
-				// 7. Close current project
+				// 7. Close Testing server client and Xojo current project
+				client.Close()
 				err = xo.ProjectCmds.Close(func(data []byte, err error) {
 					if err != nil {
 						log.Println(err)

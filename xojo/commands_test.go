@@ -45,7 +45,7 @@ func Test_checkForErrorResponse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := checkForErrorResponse(tt.args.jsonb, tt.args.err)
+			got, err := CheckForErrorResponse(tt.args.jsonb, tt.args.err)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("checkForErrorResponse() error = %v, wantErr %v", err, tt.wantErr)
 				return
