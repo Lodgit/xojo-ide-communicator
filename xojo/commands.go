@@ -1,39 +1,12 @@
 package xojo
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"strings"
 
 	"github.com/joseluisq/gonetc"
 )
-
-// xojoErrors defines Xojo error types to be checked.
-var xojoErrors = [][]byte{
-	[]byte("buildError"),
-	[]byte("loadError"),
-	[]byte("openErrors"),
-	[]byte("scriptError"),
-}
-
-// checkForErrorResponse just checks many possible errors during commands execution.
-func checkForErrorResponse(inJsonb []byte, inErr error) (jsonb []byte, err error) {
-	err = inErr
-	if err != nil {
-		return
-	}
-	jsonb = inJsonb
-	for _, errb := range xojoErrors {
-		if bytes.Contains(inJsonb, errb) {
-			err = fmt.Errorf(
-				"Xojo IDE commands execution error occurred, please check the response output",
-			)
-			return
-		}
-	}
-	return
-}
 
 // ProjectCommands defines a command for run a Xojo project.
 type ProjectCommands struct {
@@ -45,7 +18,7 @@ func (c *ProjectCommands) Open(xojoProjectFilePath string, handler func(data []b
 	str := fmt.Sprintf("{\"tag\":\"build\",\"script\":\"OpenFile(\\\"%s\\\")\nprint \\\"Project is opened.\\\"\"}%s", xojoProjectFilePath, XojoNullChar)
 	log.Println("open project command sent:", str)
 	_, err = c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
-		handler(checkForErrorResponse(data, err))
+		handler(CheckForErrorResponse(data, err))
 		done()
 	})
 	return
@@ -56,7 +29,7 @@ func (c *ProjectCommands) Run(handler func(data []byte, err error)) (err error) 
 	str := "{\"tag\":\"build\",\"script\":\"DoCommand(\\\"RunApp\\\")\nprint \\\"App is running.\\\"\"}" + XojoNullChar
 	log.Println("run project command sent:", str)
 	_, err = c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
-		handler(checkForErrorResponse(data, err))
+		handler(CheckForErrorResponse(data, err))
 		done()
 	})
 	return
@@ -67,7 +40,7 @@ func (c *ProjectCommands) Close(handler func(data []byte, err error)) (err error
 	str := "{\"tag\":\"build\",\"script\":\"CloseProject(False)\nprint \\\"Default app closed.\\\"\"}" + XojoNullChar
 	log.Println("close project command sent:", str)
 	_, err = c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
-		handler(checkForErrorResponse(data, err))
+		handler(CheckForErrorResponse(data, err))
 		done()
 	})
 	return
@@ -151,7 +124,7 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 	log.Printf("build project options chosen: %s/%s\n", vos, varch)
 	log.Printf("build project command sent: %s\n", str)
 	_, err = c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
-		handler(checkForErrorResponse(data, err))
+		handler(CheckForErrorResponse(data, err))
 		done()
 	})
 	return

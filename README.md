@@ -61,6 +61,8 @@ xojo-ide-com run --help
 
 The following command opens a local Xojo project, starts it and runs the unit tests via XojoUnit.
 
+__Note:__ The XojoUnit needs to implement the Testing Server API only if `run` command is wanted to run with `--with-tests` flag.
+
 ```sh
 xojo-ide-com run --with-tests /Users/MyUser/XojoUnit/Desktop\ Project/XojoUnitDesktop.xojo_project
 # 2020/12/17 15:36:30 close project command sent: {"tag":"build","script":"CloseProject(False) \nprint \"Default app closed.\""}
@@ -69,122 +71,168 @@ xojo-ide-com run --with-tests /Users/MyUser/XojoUnit/Desktop\ Project/XojoUnitDe
 # 2020/12/17 15:36:32 data received: {"tag":"build","response":"Project is opened."}
 # 2020/12/17 15:36:32 run project command sent: {"tag":"build","script":"DoCommand(\"RunApp\") \nprint \"App is running.\""}
 # 2020/12/17 15:36:35 data received: {"tag":"build","response":"App is running."}
-# 2020/12/17 15:36:35 waiting 5 second(s) for the application...
-# 2020/12/17 15:36:40 running project tests via XojoUnit...
+# 2020/12/17 15:36:35 Waiting 5 second(s) for the application to start...
+# 2020/12/17 15:36:40 Running project tests via XojoUnit...
 #
-#      XojoUnit version: 6.6
-#      Xojo IDE version: 2019.021
-#            Start time: 16.12.20 15:36
-#           Total tests: 84 of 86 tests in 2 groups were run
-#          Failed tests: 1 (1,19%)
-#          Passed tests: 83 (98,81%)
-#         Skipped tests: 0
-#         Skipped tests: 2
-# Not implemented tests: 2
+#  XojoUnit Testing Server
+# =========================
+# XojoUnit version: 6.6
+# Xojo IDE version: 2020r2.1
+#       Start time: 17.12.20 15:36
 #
 # === RUN   Assertion
-# --- PASS: Assertion/AreDifferentObject (0.000444 sec)
-# --- PASS: Assertion/AreDifferentString (0.000974 sec)
-# --- PASS: Assertion/AreDifferentText (0.001056 sec)
-# --- PASS: Assertion/AreEqualColor (0.001063 sec)
-# --- PASS: Assertion/AreEqualCurrency (0.001169 sec)
-# --- PASS: Assertion/AreEqualDate (0.001170 sec)
-# --- PASS: Assertion/AreEqualDoubleDefault (0.001042 sec)
-# --- PASS: Assertion/AreEqualDouble (0.004553 sec)
-# --- PASS: Assertion/AreEqualInt64 (0.001123 sec)
-# --- PASS: Assertion/AreEqualIntegerArray (0.001169 sec)
-# --- PASS: Assertion/AreEqualInteger (0.000996 sec)
-# --- PASS: Assertion/AreEqualMemoryBlock (0.001059 sec)
-# --- PASS: Assertion/AreEqualNewDate (0.001132 sec)
-# --- PASS: Assertion/AreEqualNewMemoryBlock (0.001125 sec)
-# --- PASS: Assertion/AreEqualStringArray (0.001128 sec)
-# --- PASS: Assertion/AreEqualString (0.001077 sec)
-# --- PASS: Assertion/AreEqualTextArray (0.011069 sec)
-# --- PASS: Assertion/AreEqualUInteger (0.001047 sec)
-# --- PASS: Assertion/AreNotEqualColor (0.001177 sec)
-# --- PASS: Assertion/AreNotEqualDate (0.001138 sec)
-# --- PASS: Assertion/AreNotEqualDouble (0.001022 sec)
-# --- PASS: Assertion/AreNotEqualMemoryBlock (0.009912 sec)
-# --- PASS: Assertion/AreNotEqualNewDate (0.001047 sec)
-# --- PASS: Assertion/AreNotEqualNewMemoryBlock (0.001146 sec)
-# --- PASS: Assertion/AreSameObject (0.001142 sec)
-# --- PASS: Assertion/AreSameStringArray (0.001167 sec)
-# --- PASS: Assertion/AreSameString (0.001103 sec)
-# --- PASS: Assertion/AreSameTextArray (0.003447 sec)
-# --- PASS: Assertion/AreSameText (0.001162 sec)
-# --- PASS: Assertion/AssertFailed (0.001133 sec)
-# --- PASS: Assertion/Async (0.502278 sec)
-# --- PASS: Assertion/CleanSlate1 (0.001392 sec)
-# --- PASS: Assertion/CleanSlate2 (0.001175 sec)
-# --- PASS: Assertion/DoesNotMatchString (0.001137 sec)
-# --- PASS: Assertion/DoEvents (0.992153 sec)
-# --- PASS: Assertion/IsFalse (0.001147 sec)
-# --- PASS: Assertion/IsNil (0.001233 sec)
-# --- PASS: Assertion/IsNotNil (0.001079 sec)
-# --- PASS: Assertion/IsTrue (0.001200 sec)
-# --- PASS: Assertion/MatchesString (0.001191 sec)
-# --- PASS: Assertion/NotImplemented (0.001136 sec)
-# --- PASS: Assertion/OverriddenMethod (0.001051 sec)
-# --- PASS: Assertion/Pass (0.001135 sec)
-# --- PASS: Assertion/Setup1 (0.001207 sec)
-# --- PASS: Assertion/Setup2 (0.000886 sec)
-# --- PASS: Assertion/SuperClassMethod (0.001134 sec)
-# --- PASS: Assertion/TestTimers (0.250893 sec)
-# --- PASS: Assertion/UnhandledException (0.004731 sec)
-# PASS: Assertion (1.571123 sec)
-# Total tests: 48
+# --- PASS: Assertion/AreDifferentObject (0.00ms)
+# --- PASS: Assertion/AreDifferentString (0.00ms)
+# --- PASS: Assertion/AreDifferentText (0.00ms)
+# --- PASS: Assertion/AreEqualColor (0.00ms)
+# --- PASS: Assertion/AreEqualCurrency (0.01ms)
+# --- PASS: Assertion/AreEqualDate (0.00ms)
+# --- PASS: Assertion/AreEqualDoubleDefault (0.00ms)
+# --- PASS: Assertion/AreEqualDouble (0.00ms)
+# --- PASS: Assertion/AreEqualInt64 (0.00ms)
+# --- PASS: Assertion/AreEqualIntegerArray (0.01ms)
+# --- PASS: Assertion/AreEqualInteger (0.00ms)
+# --- PASS: Assertion/AreEqualMemoryBlock (0.00ms)
+# --- PASS: Assertion/AreEqualNewDate (0.00ms)
+# --- PASS: Assertion/AreEqualNewMemoryBlock (0.00ms)
+# --- PASS: Assertion/AreEqualStringArray (0.01ms)
+# --- PASS: Assertion/AreEqualString (0.00ms)
+# --- PASS: Assertion/AreEqualTextArray (0.00ms)
+# --- PASS: Assertion/AreEqualUInteger (0.00ms)
+# --- PASS: Assertion/AreNotEqualColor (0.00ms)
+# --- PASS: Assertion/AreNotEqualDate (0.01ms)
+# --- PASS: Assertion/AreNotEqualDouble (0.00ms)
+# --- PASS: Assertion/AreNotEqualMemoryBlock (0.00ms)
+# --- PASS: Assertion/AreNotEqualNewDate (0.00ms)
+# --- PASS: Assertion/AreNotEqualNewMemoryBlock (0.00ms)
+# --- PASS: Assertion/AreSameObject (0.00ms)
+# --- PASS: Assertion/AreSameStringArray (0.01ms)
+# --- PASS: Assertion/AreSameString (0.00ms)
+# --- PASS: Assertion/AreSameTextArray (0.00ms)
+# --- PASS: Assertion/AreSameText (0.00ms)
+# --- PASS: Assertion/AssertFailed (0.00ms)
+# --- PASS: Assertion/Async (0.50ms)
+# --- PASS: Assertion/CleanSlate1 (0.01ms)
+# --- PASS: Assertion/CleanSlate2 (0.00ms)
+# --- PASS: Assertion/DoesNotMatchString (0.00ms)
+# --- PASS: Assertion/DoEvents (0.99ms)
+# --- PASS: Assertion/IsFalse (0.00ms)
+# --- PASS: Assertion/IsNil (0.00ms)
+# --- PASS: Assertion/IsNotNil (0.00ms)
+# --- PASS: Assertion/IsTrue (0.00ms)
+# --- PASS: Assertion/MatchesString (0.00ms)
+# --- SKIP: Assertion/NotImplemented (0.00ms)
+# --- PASS: Assertion/OverriddenMethod (0.00ms)
+# --- PASS: Assertion/Pass (0.00ms)
+# --- PASS: Assertion/Setup1 (0.00ms)
+# --- PASS: Assertion/Setup2 (0.00ms)
+# --- PASS: Assertion/SuperClassMethod (0.00ms)
+# --- SKIP: Assertion/TestTimers (0.25ms)
+# --- PASS: Assertion/UnhandledException (0.00ms)
+# PASS: Assertion (1.60s)
+#           Total: 48
+#          Passed: 46
+#          Failed: 0
+#         Skipped: 0
 # Not implemented: 2
-# Passed tests: 46
-# Failed tests: 0
-# Skipped tests: 0
+#
+# ---
 #
 # === RUN   Always Fail
-# --- PASS: Always Fail/AreDifferentObject (0.001139 sec)
-# --- PASS: Always Fail/AreDifferentString (0.001172 sec)
-# --- PASS: Always Fail/AreDifferentText (0.001173 sec)
-# --- PASS: Always Fail/AreEqualColor (0.001136 sec)
-# --- PASS: Always Fail/AreEqualCurrency (0.001144 sec)
-# --- PASS: Always Fail/AreEqualDate (0.001058 sec)
-# --- PASS: Always Fail/AreEqualDoubleDefault (0.001173 sec)
-# --- PASS: Always Fail/AreEqualDouble (0.001181 sec)
-# --- PASS: Always Fail/AreEqualInt64 (0.001072 sec)
-# --- PASS: Always Fail/AreEqualIntegerArray (0.001019 sec)
-# --- PASS: Always Fail/AreEqualInteger (0.001054 sec)
-# --- PASS: Always Fail/AreEqualMemoryBlock (0.000921 sec)
-# --- PASS: Always Fail/AreEqualNewDate (0.001165 sec)
-# --- PASS: Always Fail/AreEqualNewMemoryBlock (0.001169 sec)
-# --- PASS: Always Fail/AreEqualStringArray (0.001136 sec)
-# --- PASS: Always Fail/AreEqualString (0.001173 sec)
-# --- PASS: Always Fail/AreEqualTextArray (0.001202 sec)
-# --- PASS: Always Fail/AreEqualUInteger (0.000939 sec)
-# --- PASS: Always Fail/AreNotEqualColor (0.001148 sec)
-# --- PASS: Always Fail/AreNotEqualDate (0.001188 sec)
-# --- PASS: Always Fail/AreNotEqualDouble (0.001043 sec)
-# --- PASS: Always Fail/AreNotEqualMemoryBlock (0.001106 sec)
-# --- PASS: Always Fail/AreNotEqualNewDate (0.000968 sec)
-# --- PASS: Always Fail/AreNotEqualNewMemoryBlock (0.000957 sec)
-# --- PASS: Always Fail/AreSameObject (0.001108 sec)
-# --- PASS: Always Fail/AreSameStringArray (0.001173 sec)
-# --- PASS: Always Fail/AreSameString (0.001171 sec)
-# --- PASS: Always Fail/AreSameTextArray (0.001107 sec)
-# --- PASS: Always Fail/AreSameText (0.001099 sec)
-# --- PASS: Always Fail/Async (1.001193 sec)
-# --- PASS: Always Fail/DoesNotMatchString (0.001135 sec)
-# --- PASS: Always Fail/Fail (0.001136 sec)
-# --- PASS: Always Fail/IsFalse (0.001176 sec)
-# --- PASS: Always Fail/IsNil (0.000978 sec)
-# --- PASS: Always Fail/IsNotNil (0.001044 sec)
-# --- PASS: Always Fail/IsTrue (0.001013 sec)
-# --- PASS: Always Fail/MatchesString (0.001119 sec)
-# --- FAIL: Always Fail/WillTrulyFail (0.001129 sec)
-# FAIL: Always Fail (1.042017 sec)
-# Total tests: 38
+# --- PASS: Always Fail/AreDifferentObject (0.00ms)
+# --- FAIL: Always Fail/AreDifferentString (0.00ms)
+#              : String '48 65 6C 6C 6F' is the same
+#              : Expected 2 failures, but had 1
+# --- PASS: Always Fail/AreDifferentText (0.00ms)
+# --- PASS: Always Fail/AreEqualColor (0.00ms)
+# --- PASS: Always Fail/AreEqualCurrency (0.00ms)
+# --- PASS: Always Fail/AreEqualDate (0.00ms)
+# --- PASS: Always Fail/AreEqualDoubleDefault (0.00ms)
+# --- PASS: Always Fail/AreEqualDouble (0.00ms)
+# --- PASS: Always Fail/AreEqualInt64 (0.00ms)
+# --- PASS: Always Fail/AreEqualIntegerArray (0.00ms)
+# --- PASS: Always Fail/AreEqualInteger (0.00ms)
+# --- PASS: Always Fail/AreEqualMemoryBlock (0.00ms)
+# --- PASS: Always Fail/AreEqualNewDate (0.00ms)
+# --- PASS: Always Fail/AreEqualNewMemoryBlock (0.00ms)
+# --- PASS: Always Fail/AreEqualStringArray (0.00ms)
+# --- PASS: Always Fail/AreEqualString (0.00ms)
+# --- PASS: Always Fail/AreEqualTextArray (0.00ms)
+# --- PASS: Always Fail/AreEqualUInteger (0.00ms)
+# --- PASS: Always Fail/AreNotEqualColor (0.00ms)
+# --- PASS: Always Fail/AreNotEqualDate (0.00ms)
+# --- PASS: Always Fail/AreNotEqualDouble (0.00ms)
+# --- PASS: Always Fail/AreNotEqualMemoryBlock (0.00ms)
+# --- PASS: Always Fail/AreNotEqualNewDate (0.00ms)
+# --- PASS: Always Fail/AreNotEqualNewMemoryBlock (0.00ms)
+# --- PASS: Always Fail/AreSameObject (0.00ms)
+# --- PASS: Always Fail/AreSameStringArray (0.00ms)
+# --- PASS: Always Fail/AreSameString (0.00ms)
+# --- PASS: Always Fail/AreSameTextArray (0.00ms)
+# --- PASS: Always Fail/AreSameText (0.00ms)
+# --- PASS: Always Fail/Async (1.00s)
+# --- PASS: Always Fail/DoesNotMatchString (0.00ms)
+# --- PASS: Always Fail/Fail (0.00ms)
+# --- PASS: Always Fail/IsFalse (0.00ms)
+# --- PASS: Always Fail/IsNil (0.00ms)
+# --- PASS: Always Fail/IsNotNil (0.00ms)
+# --- PASS: Always Fail/IsTrue (0.00ms)
+# --- PASS: Always Fail/MatchesString (0.00ms)
+# --- FAIL: Always Fail/WillTrulyFail (0.00ms)
+#              : A RuntimeException occurred and was caught.
+#              Message: This is an on purpose exception!
+#    Error Type: RuntimeException
+#  Error Number: 0
+# Error Message: This is an on purpose exception!
+#  Error Reason: This is an on purpose exception!
+#   Error Stack:
+#             0: RuntimeRaiseException
+#             1: XojoUnitFailTests.WillTrulyFailTest%%o<XojoUnitFailTests>
+#             2: Introspection.Invoke%%
+#             3: Xojo.Introspection.MethodInfo.Invoke%x%o<Xojo.Introspection.MethodInfo>o<Object>A1x
+#             4: Xojo.Introspection.MethodInfo.Invoke%%o<Xojo.Introspection.MethodInfo>o<Object>A1x
+#             5: TestGroup.RunTestsTimer_Action%%o<TestGroup>o<Xojo.Core.Timer>
+#             6: Delegate.IM_Invoke%%o<Xojo.Core.Timer>
+#             7: _ZN10TimerImpCF15FireTimerActionEv
+#             8: _ZN10TimerImpCF13TimerCallbackEv
+#             9: __CFRUNLOOP_IS_CALLING_OUT_TO_A_TIMER_CALLBACK_FUNCTION__
+#             10: __CFRunLoopDoTimer
+#             11: __CFRunLoopDoTimers
+#             12: __CFRunLoopRun
+#             13: CFRunLoopRunSpecific
+#             14: RunCurrentEventLoopInMode
+#             15: ReceiveNextEventCommon
+#             16: _BlockUntilNextEventMatchingListInModeWithFilter
+#             17: _DPSNextEvent
+#             18: -[NSApplication(NSEvent) _nextEventMatchingEventMask:untilDate:inMode:dequeue:]
+#             19: XojoFramework$4860
+#             20: XojoFramework$4861
+#             21: Application._CallFunctionWithExceptionHandling%%o<Application>p
+#             22: _Z33CallFunctionWithExceptionHandlingPFvvE
+#             23: XojoFramework$4860
+#             24: -[NSApplication run]
+#             25: RuntimeRun
+#             26: REALbasic._RuntimeRun
+#             27: _Main
+#             28: main
+# FAIL: Always Fail (1.04s)
+#           Total: 38
+#          Passed: 36
+#          Failed: 2
+#         Skipped: 0
 # Not implemented: 0
-# Passed tests: 37
-# Failed tests: 1
-# Skipped tests: 0
 #
-# ✗ Tests has been failed.
+# ---
+#
+# Final test results:
+#           Total: 84 of 86 tests in 2 groups were run
+#          Passed: 82 (97,62%)
+#          Failed: 2 (2,38%)
+#         Skipped: 0
+# Not implemented: 2
+#
+# ✗ Tests has been failed / 2 (2,38%)
+#
 # exit status 1
 ```
 
