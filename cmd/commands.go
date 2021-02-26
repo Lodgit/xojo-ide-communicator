@@ -84,7 +84,7 @@ func RunCmd() cli.Cmd {
 				}
 				log.Println("data received:", string(data))
 			})
-			log.Printf("Waiting %d second(s) for the application's start...\n", delay)
+			log.Printf("Waiting %d second(s) for the application to start...\n", delay)
 			time.Sleep(time.Duration(delay) * time.Second)
 			// 5. Run tests if option is available
 			if runTests {
@@ -174,21 +174,21 @@ func RunCmd() cli.Cmd {
 						hasTestsFailed = true
 						fmt.Printf("FAIL: %s (%s)\n", g.Name, g.Duration)
 					}
-					fmt.Printf("Total tests: %d\n", g.Total)
+					fmt.Printf("          Total: %d\n", g.Total)
+					fmt.Printf("         Passed: %d\n", g.PassedCount)
+					fmt.Printf("         Failed: %d\n", g.FailuresCount)
+					fmt.Printf("        Skipped: %d\n", g.SkippedCount)
 					fmt.Printf("Not implemented: %d\n", g.NotImplementedCount)
-					fmt.Printf("Passed tests: %d\n", g.PassedCount)
-					fmt.Printf("Failed tests: %d\n", g.FailuresCount)
-					fmt.Printf("Skipped tests: %d\n", g.SkippedCount)
+					fmt.Println()
+					fmt.Println("---")
 					fmt.Println()
 				}
-
 				fmt.Println("Final test results:")
-				fmt.Printf("          Total tests: %s\n", testResult.Total)
-				fmt.Printf("         Failed tests: %s\n", testResult.FailuresCount)
-				fmt.Printf("         Passed tests: %s\n", testResult.PassedCount)
-				fmt.Printf("        Skipped tests: %s\n", testResult.SkippedCount)
-				fmt.Printf("        Skipped tests: %s\n", testResult.NotImplementedCount)
-				fmt.Printf("Not implemented tests: %s\n", testResult.NotImplementedCount)
+				fmt.Printf("          Total: %s\n", testResult.Total)
+				fmt.Printf("         Passed: %s\n", testResult.PassedCount)
+				fmt.Printf("         Failed: %s\n", testResult.FailuresCount)
+				fmt.Printf("        Skipped: %s\n", testResult.SkippedCount)
+				fmt.Printf("Not implemented: %s\n", testResult.NotImplementedCount)
 				fmt.Println()
 
 				if hasTestsFailed {
