@@ -2,13 +2,13 @@
 
 > CLI application to communicate transparently with [Xojo IDE](https://www.xojo.com/) via [The Xojo IDE Communication Protocol v2](https://docs.xojo.com/UserGuide:IDE_Communicator).
 
-CLI application written in [Go](https://golang.org/) that communicates with Xojo IDE using [The Xojo IDE Communication Protocol v2](https://docs.xojo.com/UserGuide:IDE_Communicator) via a more transparent API. It takes care about the underlying implementation of [Unix IPC Socket](https://en.wikipedia.org/wiki/Unix_domain_socket) communication between the two parties involved in order to instrument Xojo's IDE to run, compile or test Xojo's applications.
+CLI application written in [Go](https://golang.org/) that communicates with Xojo IDE using [The Xojo IDE Communication Protocol v2](https://docs.xojo.com/UserGuide:IDE_Communicator) taking care about the underlying implementation of [Unix IPC Socket](https://en.wikipedia.org/wiki/Unix_domain_socket) communication between the two parties involved in order to instrument Xojo's IDE to run, compile or test Xojo applications.
 
 This CLI tool makes possible to instrument the Xojo IDE for different purposes like automation. For example on [Continuous Integration and Deployment](https://www.atlassian.com/continuous-delivery/principles/continuous-integration-vs-delivery-vs-deployment) systems.
 
 ## The XojoUnit Testing Server
 
-Additionally it implements a communication mechanism with [The XojoUnit Testing Server](https://github.com/Lodgit/XojoUnit) which makes possible to run unit tests via [XojoUnit framework](https://github.com/xojo/XojoUnit) via a convenient JSON API.
+Additionally it implements a communication mechanism with [The XojoUnit Testing Server](https://github.com/Lodgit/XojoUnit) which makes possible to run unit tests using [XojoUnit framework](https://github.com/xojo/XojoUnit) through a convenient JSON API.
 
 ## Requirements
 
