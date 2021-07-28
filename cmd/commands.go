@@ -65,6 +65,9 @@ func RunCmd() cli.Cmd {
 				}
 				log.Println("data received:", string(data))
 			})
+			if err != nil {
+				return err
+			}
 			// 3. Open a new specific project
 			err = xo.ProjectCmds.Open(filePath, func(data []byte, err error) {
 				if err != nil {
@@ -208,6 +211,9 @@ func RunCmd() cli.Cmd {
 					}
 					log.Println("data received:", string(data))
 				})
+				if err != nil {
+					return err
+				}
 			}
 			return err
 		},
@@ -270,6 +276,9 @@ func BuildCmd() cli.Cmd {
 				}
 				log.Println("data received:", string(data))
 			})
+			if err != nil {
+				return err
+			}
 			// 4. Open the specified project
 			err = xo.ProjectCmds.Open(filePath, func(data []byte, err error) {
 				if err != nil {

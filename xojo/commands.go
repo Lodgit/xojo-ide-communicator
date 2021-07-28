@@ -15,7 +15,7 @@ type ProjectCommands struct {
 
 // Open opens a specific Xojo project.
 func (c *ProjectCommands) Open(xojoProjectFilePath string, handler func(data []byte, err error)) (err error) {
-	str := fmt.Sprintf("{\"tag\":\"build\",\"script\":\"OpenFile(\\\"%s\\\")\nprint \\\"Project is opened.\\\"\"}%s", xojoProjectFilePath, XojoNullChar)
+	str := fmt.Sprintf("{\"tag\":\"build\",\"script\":\"OpenFile(\\\"%s\\\")\\nprint \\\"Project is opened.\\\"\"}%s", xojoProjectFilePath, XojoNullChar)
 	log.Println("open project command sent:", str)
 	_, err = c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(CheckForErrorResponse(data, err))
@@ -26,7 +26,7 @@ func (c *ProjectCommands) Open(xojoProjectFilePath string, handler func(data []b
 
 // Run runs the current opened Xojo project.
 func (c *ProjectCommands) Run(handler func(data []byte, err error)) (err error) {
-	str := "{\"tag\":\"build\",\"script\":\"DoCommand(\\\"RunApp\\\")\nprint \\\"App is running.\\\"\"}" + XojoNullChar
+	str := "{\"tag\":\"build\",\"script\":\"DoCommand(\\\"RunApp\\\")\\nprint \\\"App is running.\\\"\"}" + XojoNullChar
 	log.Println("run project command sent:", str)
 	_, err = c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(CheckForErrorResponse(data, err))
@@ -37,7 +37,7 @@ func (c *ProjectCommands) Run(handler func(data []byte, err error)) (err error) 
 
 // Close closes the current opened project.
 func (c *ProjectCommands) Close(handler func(data []byte, err error)) (err error) {
-	str := "{\"tag\":\"build\",\"script\":\"CloseProject(False)\nprint \\\"Default app closed.\\\"\"}" + XojoNullChar
+	str := "{\"tag\":\"build\",\"script\":\"CloseProject(False)\\nprint \\\"Default app closed.\\\"\"}" + XojoNullChar
 	log.Println("close project command sent:", str)
 	_, err = c.sock.Write([]byte(str), func(data []byte, err error, done func()) {
 		handler(CheckForErrorResponse(data, err))
