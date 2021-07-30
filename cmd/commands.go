@@ -32,8 +32,19 @@ func RunCmd() cli.Cmd {
 			},
 		},
 		Handler: func(ctx *cli.CmdContext) error {
-			runTests := ctx.Flags.Bool("with-tests").IsProvided()
-			delay, err := ctx.Flags.Int("delay").Value()
+			vRunTests, err := ctx.Flags.Bool("with-tests")
+			if err != nil {
+				return err
+			}
+			runTests, err := vRunTests.Value()
+			if err != nil {
+				return err
+			}
+			vDelay, err := ctx.Flags.Int("delay")
+			if err != nil {
+				return err
+			}
+			delay, err := vDelay.Value()
 			if err != nil {
 				return err
 			}
@@ -43,7 +54,11 @@ func RunCmd() cli.Cmd {
 			}
 			// Capture the file path argument and check for a "current working directory" usage
 			filePath := ctx.TailArgs[0]
-			useWorkdir := ctx.AppContext.Flags.Bool("use-current-workdir").IsProvided()
+			vUseWorkdir, err := ctx.AppContext.Flags.Bool("use-current-workdir")
+			if err != nil {
+				return err
+			}
+			useWorkdir := vUseWorkdir.IsProvided()
 			if useWorkdir {
 				cwd, err := os.Getwd()
 				if err != nil {
@@ -245,7 +260,11 @@ func BuildCmd() cli.Cmd {
 			}
 			// Capture the file path argument and check for a "current working directory" usage
 			filePath := ctx.TailArgs[0]
-			useWorkdir := ctx.AppContext.Flags.Bool("use-current-workdir").IsProvided()
+			vUseWorkdir, err := ctx.AppContext.Flags.Bool("use-current-workdir")
+			if err != nil {
+				return err
+			}
+			useWorkdir := vUseWorkdir.IsProvided()
 			if useWorkdir {
 				cwd, err := os.Getwd()
 				if err != nil {
@@ -254,13 +273,24 @@ func BuildCmd() cli.Cmd {
 				filePath = path.Join(cwd, filePath)
 			}
 			// 1. Validate arguments
-			reveal, err := ctx.Flags.Bool("reveal").Value()
+			vReveal, err := ctx.Flags.Bool("reveal")
 			if err != nil {
 				return err
 			}
-			targets := ctx.Flags.StringSlice("targets").Value()
+			reveal, err := vReveal.Value()
+			if err != nil {
+				return err
+			}
+			vTargets, err := ctx.Flags.StringSlice("targets")
+			if err != nil {
+				return err
+			}
+			targets := vTargets.Value()
+			if err != nil {
+				return err
+			}
 			if len(targets) == 0 {
-				log.Fatalln("no build tagets specified. Use --targets option")
+				log.Fatalln("no build targets specified. Use --targets option")
 			}
 			// 2. Xojo socket connection
 			xo := xojo.New(xojo.XojoUnixSocketPath)
