@@ -96,6 +96,10 @@ func (c *ProjectCommands) Build(opt BuildOptions, handler func(data []byte, err 
 	if vos == "darwin" && varch == "arm64" {
 		buildType = 24
 	}
+	// macOS Universal 64-bit (Intel & ARM64)
+	if vos == "darwin" && varch == "universal" {
+		buildType = 9
+	}
 	if vos == "windows" && varch == "386" {
 		buildType = 3
 	}
