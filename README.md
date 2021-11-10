@@ -258,12 +258,16 @@ xojo-ide-com build --helps
 
 The following list describe operating system and architecture combination pairs supported by `--targets` option.
 
-| **Operating system** | **amd64**       | **386**       | **arm64**      |
-| -------------------- | --------------- | ------------- | -------------- |
-| Linux                | `linux-amd64`   | `linux-386`   | `linux-arm64`  |
-| macOS                | `darwin-amd64`  | `darwin-386`  | `darwin-arm64` |
-| Windows              | `windows-amd64` | `windows-386` | ?              |
-| iOS                  | `ios-amd64`     | ?             | `ios-arm64`    |
+| **Operating system** | **amd64**       | **386**       | **arm64**      | **Universal**  |
+| -------------------- | --------------- | ------------- | -------------- | -------------- |
+| Linux                | `linux-amd64`   | `linux-386`   | `linux-arm64`  |                |
+| macOS                | `darwin-amd64`  | `darwin-386`  | `darwin-arm64` | `darwin-universal` * |
+| Windows              | `windows-amd64` | `windows-386` | ?              |                |
+| iOS                  | `ios-amd64`     | ?             | `ios-arm64`    |                |
+
+**Notes:**
+
+- \* Xojo [macOS Universal](https://developer.apple.com/documentation/apple-silicon/porting-your-macos-apps-to-apple-silicon) provides support for Apple Silicon (ARM64) and Intel-based (adm64) Mac computers.
 
 More details at https://docs.xojo.com/UserGuide:IDE_Scripting_Building_Commands
 
